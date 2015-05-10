@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaveFitness", "DaveFitness\DaveFitness.csproj", "{B0ED21AB-70D0-41EA-B4EF-7DBBE035886D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechRecognition", "SpeechRecognition\SpeechRecognition.csproj", "{9B3C09D2-F81B-4989-A718-D1A6B42DB683}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B0ED21AB-70D0-41EA-B4EF-7DBBE035886D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0ED21AB-70D0-41EA-B4EF-7DBBE035886D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0ED21AB-70D0-41EA-B4EF-7DBBE035886D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B3C09D2-F81B-4989-A718-D1A6B42DB683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B3C09D2-F81B-4989-A718-D1A6B42DB683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B3C09D2-F81B-4989-A718-D1A6B42DB683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B3C09D2-F81B-4989-A718-D1A6B42DB683}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
