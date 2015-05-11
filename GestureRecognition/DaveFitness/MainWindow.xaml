@@ -1,19 +1,14 @@
-﻿<Window x:Class="DaveFitness.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="600" Width="1300">
+        xmlns:Panels="clr-namespace:DaveFitness.Panels" x:Class="DaveFitness.MainWindow"
+        Title="MainWindow" Height="630" Width="1300">
   <Grid>
-    <Grid.Background>
-      <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-        <GradientStop Color="Black" Offset="1"/>
-        <GradientStop Color="#FFC9F500"/>
-        <GradientStop Color="#FFA0FD7D" Offset="0.815"/>
-      </LinearGradientBrush>
-    </Grid.Background>
-    <Canvas HorizontalAlignment="Left" Height="549" Margin="10,10,0,0" VerticalAlignment="Top" Width="650" Background="Black"/>
-    <Label Name="exerciseLbl" Content="Exercise" HorizontalAlignment="Left" Margin="750,50,0,0" VerticalAlignment="Top" Height="100" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-    <Label Name="trainLbl" Content="Train" HorizontalAlignment="Left" Height="100" Margin="750,155,0,0" VerticalAlignment="Top" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-    <Label Name="testLbl" Content="Test" HorizontalAlignment="Left" Height="100" Width="500" Margin="750,260,0,0" VerticalAlignment="Top" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+    
+    <Panels:MainPanel x:Name="mainPanel" HorizontalAlignment="Left" Height="600" VerticalAlignment="Top" Width="1300"/>
+    <Panels:ExercisePanel x:Name="exercisePanel" HorizontalAlignment="Left" Height="600" VerticalAlignment="Top" Width="1300" Visibility="Hidden"/>
+    <Panels:TestPanel x:Name="testPanel" HorizontalAlignment="Left" Height="600" VerticalAlignment="Top" Width="1300" Visibility="Hidden"/>
+    <Panels:TrainPanel x:Name="trainPanel" HorizontalAlignment="Left" Height="600" VerticalAlignment="Top" Width="1300" Visibility="Hidden"/>
 
   </Grid>
 </Window>

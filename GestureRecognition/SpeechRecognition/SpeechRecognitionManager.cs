@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using Microsoft.Speech.AudioFormat;
+using Microsoft.Speech.Recognition;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Speech.Recognition;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,30 +15,32 @@ namespace SpeechRecognition {
   public class SpeechRecognitionManager {
     public event RecognizedCommandEventHandler RecognizedCommandEventHandler;
 
-    public SpeechRecognitionManager() {
-      //// Create a new SpeechRecognitionEngine instance.
-      SpeechRecognizer recognizer = new SpeechRecognizer();
+    public SpeechRecognitionManager(KinectSensor kinectSensor) {
+      sensor = kinectSensor;
 
-      // Create a simple grammar that recognizes "red", "green", or "blue".
-      Choices options = new Choices();
-      options.Add(new string[] { "exercise", "train", "test" });
+      RecognizerInfo recognizerInfo = GetKinectRecognizer();
 
-      // Create a GrammarBuilder object and append the Choices object.
-      GrammarBuilder gb = new GrammarBuilder();
-      gb.Append(options);
 
-      // Create the Grammar instance and load it into the speech recognition engine.
-      Grammar g = new Grammar(gb);
-      recognizer.LoadGrammar(g);
+      if (null != recognizerInfo) {
+        this.speechEngine = new SpeechRecognitionEngine(recognizerInfo.Id);
 
-      // Register a handler for the SpeechRecognized event.
-      recognizer.SpeechRecognized += RecognizedSpeech;
+        Choices options = new Choices();
+        options.Add(new string[] { "exercise", "train", "test" });
 
-    }
+        
+        GrammarBuilder grammarBuilder = new GrammarBuilder { Culture = recognizerInfo.Culture };
+        grammarBuilder.Append(options);
 
-    void RecognizedSpeech(object sender, SpeechRecognizedEventArgs e) {
-      if (e.Result.Confidence >= 0.5) {
-        OnEvent(new RecognizedCommandEventArgs(e.Result.Text));
+        Grammar grammar = new Grammar(grammarBuilder);
+        speechEngine.LoadGrammar(grammar);
+
+        speechEngine.SpeechRecognized += SpeechRecognized;
+        speechEngine.SpeechRecognitionRejected += SpeechRejected;
+
+        speechEngine.SetInputToAudioStream(
+            sensor.AudioSource.Start(), new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
+        speechEngine.RecognizeAsync(RecognizeMode.Multiple);
+      } else {
       }
     }
 
@@ -43,5 +49,33 @@ namespace SpeechRecognition {
         RecognizedCommandEventHandler(this, e);
       }
     }
+
+    private RecognizerInfo GetKinectRecognizer() {
+      foreach (RecognizerInfo recognizer in SpeechRecognitionEngine.InstalledRecognizers()) {
+        string value;
+        recognizer.AdditionalInfo.TryGetValue("Kinect", out value);
+        if ("True".Equals(value, StringComparison.OrdinalIgnoreCase) && "en-US".Equals(recognizer.Culture.Name, StringComparison.OrdinalIgnoreCase)) {
+          return recognizer;
+        }
+      }
+
+      return null;
+    }
+
+
+    private void SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
+      const double confidenceThreshold = 0.5;
+
+      if (e.Result.Confidence >= confidenceThreshold) {
+        OnEvent(new RecognizedCommandEventArgs(e.Result.Text));
+      }
+    }
+
+    private void SpeechRejected(object sender, SpeechRecognitionRejectedEventArgs e) {
+      Console.WriteLine("Rejected");
+    }
+
+    private KinectSensor sensor;
+    private SpeechRecognitionEngine speechEngine;
   }
 }

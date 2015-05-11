@@ -1,4 +1,5 @@
-﻿using SpeechRecognition;
+﻿using GestureRecognition.Managers;
+using SpeechRecognition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,37 +15,39 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace DaveFitness {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
   public partial class MainWindow : Window {
     public MainWindow() {
       InitializeComponent();
+      this.Closed += ClosedWindow;
 
-      speechRecognitionManager = new SpeechRecognitionManager();
+
+      kinectManager = new KinectManager();
+      kinectManager.Start();
+
+      speechRecognitionManager = new SpeechRecognitionManager(kinectManager.Sensor);
       speechRecognitionManager.RecognizedCommandEventHandler += RecognizedCommand;
+
+      mainPanel.SpeechManager = speechRecognitionManager;
+    }
+
+    private void ClosedWindow(object sender, System.EventArgs e) {
+      kinectManager.Stop();
     }
 
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
         case "exercise" :
-          HighlightLabel(exerciseLbl);
           break;
         case "train" :
-          HighlightLabel(trainLbl);
           break;
         case "test" :
-          HighlightLabel(testLbl);
           break;
       }
     }
 
-    private void HighlightLabel(Label label) {
-      SolidColorBrush brush = new SolidColorBrush(Colors.LightGreen);
-      label.Background = brush;
-    }
-
+    private KinectManager kinectManager;
     private SpeechRecognitionManager speechRecognitionManager;
   }
 }
