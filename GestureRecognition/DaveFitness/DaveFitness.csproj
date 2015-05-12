@@ -65,6 +65,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Events\CommandEventArgs.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -129,6 +130,10 @@
     <ProjectReference Include="..\GestureRecognition\GestureRecognition.csproj">
       <Project>{aff8f315-3eda-480d-bca9-454c0f6f4856}</Project>
       <Name>GestureRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SkeletonModel\SkeletonModel.csproj">
+      <Project>{8cb0115e-f384-43fb-899e-4d581687c2ad}</Project>
+      <Name>SkeletonModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\SpeechRecognition\SpeechRecognition.csproj">
       <Project>{9b3c09d2-f81b-4989-a718-d1a6b42db683}</Project>

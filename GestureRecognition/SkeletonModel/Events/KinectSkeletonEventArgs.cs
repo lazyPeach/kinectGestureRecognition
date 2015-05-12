@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GestureRecognition.Events {
-  public class KinectManagerEventArgs : EventArgs {
-    public KinectManagerEventArgs(Skeleton skeleton) {
+namespace SkeletonModel.Events {
+  public class KinectSkeletonEventArgs : EventArgs {
+    public KinectSkeletonEventArgs(Skeleton skeleton) {
       this.skeleton = skeleton;
     }
 

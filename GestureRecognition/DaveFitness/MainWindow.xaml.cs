@@ -1,4 +1,5 @@
-﻿using GestureRecognition.Managers;
+﻿using DaveFitness.Events;
+using SkeletonModel.Managers;
 using SpeechRecognition;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace DaveFitness {
       speechRecognitionManager.RecognizedCommandEventHandler += RecognizedCommand;
 
       mainPanel.SpeechManager = speechRecognitionManager;
+      mainPanel.CommandEventHandler += MainPanelCommand;
+
+      trainPanel.KinectManager = kinectManager;
     }
 
     private void ClosedWindow(object sender, System.EventArgs e) {
@@ -43,6 +47,26 @@ namespace DaveFitness {
         case "train" :
           break;
         case "test" :
+          break;
+      }
+    }
+
+    private void MainPanelCommand(object sender, CommandEventArgs e) {
+      switch (e.Command) {
+        case Command.Exercise:
+          exercisePanel.Visibility = System.Windows.Visibility.Visible;
+          trainPanel.Visibility = System.Windows.Visibility.Hidden;
+          testPanel.Visibility = System.Windows.Visibility.Hidden;
+          break;
+        case Command.Train:
+          exercisePanel.Visibility = System.Windows.Visibility.Hidden;
+          trainPanel.Visibility = System.Windows.Visibility.Visible;
+          testPanel.Visibility = System.Windows.Visibility.Hidden;
+          break;
+        case Command.Test:
+          exercisePanel.Visibility = System.Windows.Visibility.Hidden;
+          trainPanel.Visibility = System.Windows.Visibility.Hidden;
+          testPanel.Visibility = System.Windows.Visibility.Visible;
           break;
       }
     }

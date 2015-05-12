@@ -1,4 +1,5 @@
-﻿using SpeechRecognition;
+﻿using DaveFitness.Events;
+using SpeechRecognition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DaveFitness.Panels {
+  public delegate void CommandEventHandler(object sender, CommandEventArgs e);
+
   public partial class MainPanel : UserControl {
+    public event CommandEventHandler CommandEventHandler;
+
     public MainPanel() {
       InitializeComponent();
     }
-
 
     public SpeechRecognitionManager SpeechManager {
       set {
@@ -35,18 +39,26 @@ namespace DaveFitness.Panels {
         case "exercise":
           ClearLabelsBackground();
           HighlightLabel(ExerciseLbl);
+          FireEvent(new CommandEventArgs(Command.Exercise));
           break;
         case "train":
           ClearLabelsBackground();
           HighlightLabel(TrainLbl);
+          FireEvent(new CommandEventArgs(Command.Train));
           break;
         case "test":
           ClearLabelsBackground();
           HighlightLabel(TestLbl);
+          FireEvent(new CommandEventArgs(Command.Test));
           break;
       }
     }
 
+    protected virtual void FireEvent(CommandEventArgs e) {
+      if (CommandEventHandler != null) {
+        CommandEventHandler(this, e);
+      }
+    }
 
     private void ClearLabelsBackground() {
       ClearLabelBackground(ExerciseLbl);
@@ -74,7 +86,7 @@ namespace DaveFitness.Panels {
     }
 
     private void ExerciseLblMouseClick(object sender, MouseButtonEventArgs e) {
-      Console.WriteLine("click on exercise");
+      FireEvent(new CommandEventArgs(Command.Exercise));
     }
 
     private void TrainLblMouseMove(object sender, MouseEventArgs e) {
@@ -86,7 +98,7 @@ namespace DaveFitness.Panels {
     }
 
     private void TrainLblMouseClick(object sender, MouseButtonEventArgs e) {
-      Console.WriteLine("click on train");
+      FireEvent(new CommandEventArgs(Command.Train));
     }
 
     private void TestLblMouseMove(object sender, MouseEventArgs e) {
@@ -98,7 +110,7 @@ namespace DaveFitness.Panels {
     }
 
     private void TestLblMouseClick(object sender, MouseButtonEventArgs e) {
-      Console.WriteLine("click on test");
+      FireEvent(new CommandEventArgs(Command.Test));
     }
 
 
