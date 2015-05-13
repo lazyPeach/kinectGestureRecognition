@@ -17,17 +17,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DaveFitness.Panels {
-  /// <summary>
-  /// Interaction logic for TrainPanel.xaml
-  /// </summary>
   public partial class TrainPanel : UserControl {
     public TrainPanel() {
       InitializeComponent();
     }
-
-
-
-    
 
     public KinectManager KinectManager { 
       set { 
@@ -37,8 +30,8 @@ namespace DaveFitness.Panels {
       }
     }
 
+
     private void ColorFrameHandler(object sender, KinectColorFrameEventArgs e) {
-      
       if (pixels == null) {
         pixels = new byte[e.ImageFrame.PixelDataLength];
       }
@@ -54,54 +47,40 @@ namespace DaveFitness.Panels {
       int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
       cameraSource.WritePixels( new Int32Rect(0, 0, e.ImageFrame.Width, e.ImageFrame.Height),
             pixels, e.ImageFrame.Width * Bgr32BytesPerPixel, 0);
-      
-      //camera.Source = cameraSource;
+
+      cameraFrame.Source = cameraSource;
     }
 
     private void SkeletonEventHandler(object sender, KinectSkeletonEventArgs e) {
+      KinectSensor sensor = GetKinectSensor(sender);
+      DrawSkeleton(new CoordinateMapper(sensor), e.Skeleton);
+    }
+
+    private KinectSensor GetKinectSensor(object eventSender) {
+      KinectManager manager = eventSender as KinectManager;
+      return manager.Sensor;
+    }
+
+    private void DrawSkeleton(CoordinateMapper coordinateMapper, Skeleton skeleton) {
       DrawingVisual drawingVisual = new DrawingVisual();
       DrawingContext drawingContext = drawingVisual.RenderOpen();
 
+      foreach (Joint joint in skeleton.Joints) {
+        ColorImagePoint colorImagePoint = coordinateMapper.MapSkeletonPointToColorPoint(
+          joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
-      
-      
-      
-      
-      
-      //foreach (Joint joint in e.Skeleton.Joints) {
-        Point p = new Point(/*joint.Position.X, joint.Position.Y*/ 50, 50);
-        drawingContext.DrawEllipse(new SolidColorBrush(Color.FromArgb(0, 255, 255, 0)), null, p, 30, 30);
-        
-        //if (startJoint == null || endJoint == null) continue;
-
-        //double x1 = startJoint.XCoord - centerJointX;
-        //double y1 = startJoint.YCoord - centerJointY;
-        //double x2 = endJoint.XCoord - centerJointX;
-        //double y2 = endJoint.YCoord - centerJointY;
-
-        //DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, canvas); // have a mirror display
-      //}
+        Point point = new Point(colorImagePoint.X, colorImagePoint.Y);
+        drawingContext.DrawEllipse(new SolidColorBrush(Color.FromArgb(255, 255, 255, 0)),
+          null, point, 5, 5);
+      }
 
       drawingContext.Close();
-      RenderTargetBitmap renderBmp = new RenderTargetBitmap(400, 400, 96d, 96d, PixelFormats.Pbgra32);
+      RenderTargetBitmap renderBmp = new RenderTargetBitmap(640, 480, 96d, 96d, PixelFormats.Pbgra32);
       renderBmp.Render(drawingVisual);
-      skeleton.Source = renderBmp;
-      
-      Console.WriteLine("skelet");
+      skeletonFrame.Source = renderBmp;
     }
 
-    private void DrawPoint(double x, double y, Canvas canvas) {
-      Ellipse point = new Ellipse {
-        Width = 30,
-        Height = 30,
-        Fill = new SolidColorBrush(Colors.Yellow)
-      };
-
-      Canvas.SetLeft(point, x - point.Width / 2);
-      Canvas.SetTop(point, y - point.Height / 2);
-      canvas.Children.Add(point);
-    }
-
+    
     private byte[] pixels;
     private WriteableBitmap cameraSource;
     private KinectManager kinectManager;

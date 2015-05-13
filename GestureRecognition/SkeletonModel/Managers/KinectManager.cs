@@ -32,6 +32,7 @@ namespace SkeletonModel.Managers {
       kinectSensor = KinectSensor.KinectSensors.FirstOrDefault(s => s.Status == KinectStatus.Connected);
       kinectSensor.SkeletonStream.Enable();
       kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+      kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
 
       skeletonData = new Skeleton[kinectSensor.SkeletonStream.FrameSkeletonArrayLength];
 
