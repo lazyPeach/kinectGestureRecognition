@@ -5,8 +5,48 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1300">
-    <Grid Background="BlueViolet">
+  <Grid>
+    <Grid.Background>
+      <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+        <GradientStop Color="Black" Offset="1"/>
+        <GradientStop Color="#FFCCFF00"/>
+        <GradientStop Color="#FFA0FD7D" Offset="0.815"/>
+      </LinearGradientBrush>
+    </Grid.Background>
+
     <Image Name="cameraFrame" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
     <Image Name="skeletonFrame" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
+    <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Margin="655,10,0,0" VerticalAlignment="Top" Height="250" Width="635" FontWeight="Bold" FontSize="30">
+      In order to add a new gesture, you have to insert the new gesture name in the text box below, click add, move in the initial position and say 'Start'.
+      After you say start wait for 5 seconds. At the end of the 5 seconds start performing the gesture for 5 times.
+    </TextBlock>
+    <TextBox Name="newGestureTxt" HorizontalAlignment="Left" Height="50" Margin="655,265,0,0" TextWrapping="Wrap" Foreground="#99000000" Text="gesture name" VerticalAlignment="Top" Width="530" FontSize="30" GotFocus="NewGestureTxtGotFocus" />
+    <Button Name="addGestureBtn" Content="Add" HorizontalAlignment="Left" Foreground="White" Margin="1189,265,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="addGestureBtn_Click" FontSize="25" FontWeight="Bold">
+      <Button.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+          <GradientStop Color="#FFCCFF00" Offset="0"/>
+          <GradientStop Color="Black" Offset="1"/>
+        </LinearGradientBrush>
+      </Button.Background>
+    </Button>
+    <ListBox HorizontalAlignment="Left" Height="270" Margin="655,318,0,0" VerticalAlignment="Top" Width="530"/>
+    <Button Name="removeGestureBtn" Content="Remove" Foreground="White" HorizontalAlignment="Left" Margin="1190,320,0,0" VerticalAlignment="Top" Width="99" Height="50" FontSize="25" FontWeight="Bold" Click="removeGestureBtn_Click">
+      <Button.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+          <GradientStop Color="#FFCCFF00" Offset="0"/>
+          <GradientStop Color="Black" Offset="1"/>
+        </LinearGradientBrush>
+      </Button.Background>
+    </Button>
+    <Label Content="Time" Foreground="White" HorizontalAlignment="Left" Margin="10,495,0,0" VerticalAlignment="Top" Height="50" Width="90" FontSize="30" FontWeight="Bold"/>
+    <Rectangle Fill="Green" HorizontalAlignment="Left" Height="50" Margin="105,495,0,0" VerticalAlignment="Top" Width="30"/>
+    <Rectangle Fill="Green" HorizontalAlignment="Left" Height="50" Margin="140,495,0,0" VerticalAlignment="Top" Width="30"/>
+    <Rectangle Fill="Green" HorizontalAlignment="Left" Height="50" Margin="175,495,0,0" VerticalAlignment="Top" Width="30"/>
+    <Rectangle Fill="Green" HorizontalAlignment="Left" Height="50" Margin="210,495,0,0" VerticalAlignment="Top" Width="30"/>
+    <Rectangle Fill="Green" HorizontalAlignment="Left" Height="50" Margin="245,495,0,0" VerticalAlignment="Top" Width="30"/>
+    
+    <Label Content="Repetitions" Foreground="White" HorizontalAlignment="Left" Margin="330,495,0,0" VerticalAlignment="Top" Height="50" Width="170" FontSize="30" FontWeight="Bold"/>
+    <Label Name="repetitionsLbl" Content="" Foreground="White" HorizontalAlignment="Left" Margin="505,495,0,0" VerticalAlignment="Top" Height="50" Width="50" FontSize="30" FontWeight="Bold"/>
+
   </Grid>
 </UserControl>

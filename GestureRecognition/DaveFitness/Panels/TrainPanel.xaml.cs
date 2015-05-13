@@ -84,5 +84,20 @@ namespace DaveFitness.Panels {
     private byte[] pixels;
     private WriteableBitmap cameraSource;
     private KinectManager kinectManager;
+
+    private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
+
+    }
+
+    private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
+
+    }
+
+    private void NewGestureTxtGotFocus(object sender, RoutedEventArgs e) {
+      if (newGestureTxt.Text == "gesture name") {
+        newGestureTxt.Text = "";
+        newGestureTxt.Foreground = new SolidColorBrush(Colors.Black);
+      }
+    }
   }
 }

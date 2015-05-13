@@ -16,9 +16,9 @@
       </Grid.Background>
       
       <Canvas HorizontalAlignment="Left" Height="580" Margin="10,10,0,0" VerticalAlignment="Top" Width="650" Background="Black"/>
-      <Label Name="ExerciseLbl" Content="Exercise" HorizontalAlignment="Left" Margin="750,50,0,0" VerticalAlignment="Top" Height="100" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseMove="ExerciseLblMouseMove" MouseLeave="ExerciseLblMouseLeave" MouseDown="ExerciseLblMouseClick"/>
-      <Label Name="TrainLbl" Content="Train" HorizontalAlignment="Left" Height="100" Margin="750,155,0,0" VerticalAlignment="Top" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseDown="TrainLblMouseClick" MouseLeave="TrainLblMouseLeave" MouseMove="TrainLblMouseMove"/>
-      <Label Name="TestLbl" Content="Test" HorizontalAlignment="Left" Height="100" Width="500" Margin="750,260,0,0" VerticalAlignment="Top" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseMove="TestLblMouseMove" MouseLeave="TestLblMouseLeave" MouseDown="TestLblMouseClick"/>
+      <Label Name="ExerciseLbl" Content="Exercise" HorizontalAlignment="Left" Margin="750,50,0,0" VerticalAlignment="Top" Height="100" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseMove="ExerciseLblMouseMove" MouseLeave="ExerciseLblMouseLeave" MouseDown="ExerciseLblMouseClick" FontWeight="Bold"/>
+      <Label Name="TrainLbl" Content="Train" HorizontalAlignment="Left" Height="100" Margin="750,155,0,0" VerticalAlignment="Top" Width="500" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseDown="TrainLblMouseClick" MouseLeave="TrainLblMouseLeave" MouseMove="TrainLblMouseMove" FontWeight="Bold"/>
+      <Label Name="TestLbl" Content="Test" HorizontalAlignment="Left" Height="100" Width="500" Margin="750,260,0,0" VerticalAlignment="Top" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseMove="TestLblMouseMove" MouseLeave="TestLblMouseLeave" MouseDown="TestLblMouseClick" FontWeight="Bold"/>
 
     </Grid>
 
