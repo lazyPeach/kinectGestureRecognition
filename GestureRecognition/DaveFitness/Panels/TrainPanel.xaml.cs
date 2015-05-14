@@ -3,11 +3,13 @@ using GestureRecognition.Exceptions;
 using Microsoft.Kinect;
 using SkeletonModel.Events;
 using SkeletonModel.Managers;
+using SpeechRecognition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,9 +29,76 @@ namespace DaveFitness.Panels {
       gestureIndex.LoadDB();
       UpdateGestureList(gestureIndex.GetAllGestures());
       gestureList.SelectedIndex = 0;
-    }
-    
 
+      AddRectangles();
+    }
+
+    private Rectangle[] timeRect;
+
+    private void AddRectangles() {
+      timeRect = new Rectangle[5];
+      SolidColorBrush fillBrush = new SolidColorBrush(Colors.Green);
+
+      for (int i = 0; i < 5; i++) {
+        timeRect[i] = new Rectangle();
+        timeRect[i].Height = 50;
+        timeRect[i].Width = 30;
+        timeRect[i].Fill = fillBrush;
+        timerGrid.Children.Add(timeRect[i]);
+        Grid.SetColumn(timeRect[i], i);
+      }
+    }
+
+    public SpeechRecognitionManager SpeechManager {
+      set {
+        speechManager = value;
+        speechManager.RecognizedCommandEventHandler += RecognizedCommand;
+      }
+    }
+
+    private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
+      switch (e.RecognizedCommand) {
+        case "start":
+          CountDown();
+          Console.WriteLine("start");
+          break;
+        case "back": // TODO
+          Console.WriteLine("back");
+          break;
+        case "up":
+          if (gestureList.SelectedIndex > 0)
+            gestureList.SelectedIndex--;
+          break;
+        case "down":
+          if (gestureList.SelectedIndex < gestureList.Items.Count)
+            gestureList.SelectedIndex++;
+          break;
+        case "select": //TODO
+          Console.WriteLine("select");
+          break;
+      }
+    }
+
+    private int countdownSec;
+    private Timer timer;
+
+    private void CountDown() {
+      countdownSec = 0;
+      timer = new System.Timers.Timer { Interval = 1000 };
+      timer.Elapsed += PauseSystem;
+      timer.Start();
+    }
+
+    private void PauseSystem(object sender, System.Timers.ElapsedEventArgs e) {
+      //OnEvent(new InitialPositionEventArgs(State.Pause, ++countdownSec, false));
+      this.Dispatcher.Invoke((Action)(() => { // update label
+        timeRect[countdownSec++].Visibility = System.Windows.Visibility.Hidden;
+      }));
+      if (countdownSec == 5) {
+        timer.Stop();
+        return;
+      }
+    }
 
     public KinectManager KinectManager { 
       set { 
@@ -134,5 +203,7 @@ namespace DaveFitness.Panels {
     private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
       Console.WriteLine((string)gestureList.SelectedItem);
     }
+
+    private SpeechRecognitionManager speechManager; 
   }
 }

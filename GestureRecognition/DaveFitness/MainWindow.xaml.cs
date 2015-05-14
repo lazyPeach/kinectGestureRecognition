@@ -34,6 +34,7 @@ namespace DaveFitness {
       mainPanel.CommandEventHandler += MainPanelCommand;
 
       trainPanel.KinectManager = kinectManager;
+      trainPanel.SpeechManager = speechRecognitionManager;
     }
 
     private void ClosedWindow(object sender, System.EventArgs e) {
@@ -42,11 +43,29 @@ namespace DaveFitness {
 
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
-        case "exercise" :
+        case "exercise":
+          Console.WriteLine("exercise");
           break;
-        case "train" :
+        case "train":
+          Console.WriteLine("train");
           break;
-        case "test" :
+        case "test":
+          Console.WriteLine("test");
+          break;
+        case "start":
+          Console.WriteLine("start");
+          break;
+        case "back":
+          Console.WriteLine("back");
+          break;
+        case "up":
+          Console.WriteLine("up");
+          break;
+        case "down":
+          Console.WriteLine("down");
+          break;
+        case "select":
+          Console.WriteLine("select");
           break;
       }
     }

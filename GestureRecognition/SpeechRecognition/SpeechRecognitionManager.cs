@@ -25,7 +25,7 @@ namespace SpeechRecognition {
         this.speechEngine = new SpeechRecognitionEngine(recognizerInfo.Id);
 
         Choices options = new Choices();
-        options.Add(new string[] { "exercise", "train", "test" });
+        options.Add(new string[] { "exercise", "train", "test", "start", "back", "up", "down", "select" });
 
         
         GrammarBuilder grammarBuilder = new GrammarBuilder { Culture = recognizerInfo.Culture };
