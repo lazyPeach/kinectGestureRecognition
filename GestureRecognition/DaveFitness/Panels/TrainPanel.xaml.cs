@@ -1,4 +1,6 @@
-﻿using Microsoft.Kinect;
+﻿using GestureRecognition;
+using GestureRecognition.Exceptions;
+using Microsoft.Kinect;
 using SkeletonModel.Events;
 using SkeletonModel.Managers;
 using System;
@@ -20,6 +22,19 @@ namespace DaveFitness.Panels {
   public partial class TrainPanel : UserControl {
     public TrainPanel() {
       InitializeComponent();
+
+      g = new GestureIndex();
+      g.LoadDB();
+      UpdateGestureList(g.GetAllGestures());
+    }
+    
+    private void UpdateGestureList(List<string> gestures) {
+      gestureList.Items.Clear();
+      foreach (string gesture in gestures) {
+        gestureList.Items.Add(gesture);
+      }
+
+      gestureList.SelectedIndex = 0;
     }
 
     public KinectManager KinectManager { 
@@ -80,13 +95,19 @@ namespace DaveFitness.Panels {
       skeletonFrame.Source = renderBmp;
     }
 
-    
-    private byte[] pixels;
-    private WriteableBitmap cameraSource;
-    private KinectManager kinectManager;
-
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
+      if (newGestureTxt.Text == "")
+        MessageBox.Show("You have to type a gesture name");
 
+      try {
+        g.AddGesture(newGestureTxt.Text);
+      } catch (GestureAlreadyExistsException ex) {
+        MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
+      }
+
+      g.SaveDB();
+      UpdateGestureList(g.GetAllGestures());
+      newGestureTxt.Text = "";
     }
 
     private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
@@ -99,5 +120,11 @@ namespace DaveFitness.Panels {
         newGestureTxt.Foreground = new SolidColorBrush(Colors.Black);
       }
     }
+
+
+    private byte[] pixels;
+    private WriteableBitmap cameraSource;
+    private KinectManager kinectManager;
+    private GestureIndex g;
   }
 }
