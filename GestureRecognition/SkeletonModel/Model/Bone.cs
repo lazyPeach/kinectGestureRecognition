@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace SkeletonModel.Model {
   public class Bone {
     public Bone() : this(new Rotation(), BoneName.BodyCenter) { }

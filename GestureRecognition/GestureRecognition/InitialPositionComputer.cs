@@ -1,0 +1,154 @@
+﻿using GestureRecognition.Events;
+using SkeletonModel.Events;
+using SkeletonModel.Managers;
+using SkeletonModel.Model;
+using SkeletonModel.Util;
+using System;
+using System.Collections.Generic;
+
+namespace GestureRecognition {
+  public delegate void InitialPositionEventHandler(object sender, InitialPositionEventArgs e);
+
+  public class InitialPositionComputer {
+    public event InitialPositionEventHandler InitialPositionEventHandler;
+
+    public InitialPositionComputer(BodyManager bodyManager) {
+      initialPositionDeviation = new BodyDeviation();
+      bodySamples = new List<Body>();
+      
+      this.bodyManager = bodyManager;
+      bodyManager.BodyEventHandler += BodyEventHandler;
+    }
+
+    public void ComputeInitialPosition() {
+      foreach (Body body in bodySamples) {
+        foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+          ComputeMinBounds(body, boneName);
+          ComputeMaxBounds(body, boneName);
+        }
+      }
+
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        OffsetBounds(boneName);
+      }
+
+      isInitialPositionComputed = true;
+    }
+
+    public bool Record { set { shouldRecord = value; } }
+
+
+    private void BodyEventHandler(object sender, BodyEventArgs e) {
+      if (shouldRecord) {
+        bodySamples.Add(e.Body);
+        return;
+      }
+
+      if (IsInitialPosition(e.Body)) {
+        FireEvent(new InitialPositionEventArgs());
+      }
+    }
+
+    protected virtual void FireEvent(InitialPositionEventArgs e) {
+      if (InitialPositionEventHandler != null) {
+        InitialPositionEventHandler(this, e);
+      }
+    }
+
+    private bool IsInitialPosition(Body body) {
+      if (!isInitialPositionComputed) {
+        return false;
+      }
+
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        bool godCondition =
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W > initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W < initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X > initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X < initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y > initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y < initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z > initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z &&
+          body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z < initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z;
+
+        if (!godCondition) return false;
+      }
+
+      return true;
+    }
+
+    private void OffsetBounds(BoneName boneName) {
+      float offset;
+      if (boneName == BoneName.BodyCenter || boneName == BoneName.Neck) {
+        offset = 0.5f;
+      } else if (boneName == BoneName.ArmLeft || boneName == BoneName.ArmRight ||
+                 boneName == BoneName.ForearmLeft || boneName == BoneName.ForearmRight ||
+                 boneName == BoneName.FemurusLeft || boneName == BoneName.FemurusRight ||
+                 boneName == BoneName.TibiaLeft || boneName == BoneName.TibiaRight) {
+        offset = 0.05f;
+      } else {
+        offset = 0.1f;
+      }
+
+      OffsetMinBound(boneName, offset);
+      OffsetMaxBound(boneName, offset);
+    }
+
+    private void OffsetMaxBound(BoneName boneName, float offset) {
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W += offset;
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X += offset;
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y += offset;
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z += offset;
+    }
+
+    private void OffsetMinBound(BoneName boneName, float offset) {
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W -= offset;
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X -= offset;
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y -= offset;
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z -= offset;
+    }
+
+    private void ComputeMaxBounds(Body body, BoneName boneName) {
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W =
+        Math.Max(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W,
+          initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W);
+
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X =
+        Math.Max(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X,
+          initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X);
+
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y =
+        Math.Max(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y,
+          initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y);
+
+      initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z =
+        Math.Max(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z,
+          initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z);
+    }
+
+    private void ComputeMinBounds(Body body, BoneName boneName) {
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W =
+        Math.Min(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W,
+          initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W);
+
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X =
+        Math.Min(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X,
+          initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.X);
+
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y =
+        Math.Min(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y,
+          initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Y);
+
+      initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z =
+        Math.Min(body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z,
+          initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.Z);
+    }
+
+
+    private bool shouldRecord = false;
+    private bool isInitialPositionComputed = false;
+    private BodyManager bodyManager;
+    private BodyDeviation initialPositionDeviation;
+    private List<Body> bodySamples;
+  }
+}

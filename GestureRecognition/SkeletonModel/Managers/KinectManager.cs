@@ -1,10 +1,6 @@
 ﻿using Microsoft.Kinect;
 using SkeletonModel.Events;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkeletonModel.Managers {
   public delegate void KinectSkeletonEventHandler(object sender, KinectSkeletonEventArgs e);

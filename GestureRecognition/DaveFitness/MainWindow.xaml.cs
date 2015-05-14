@@ -2,19 +2,7 @@
 using SkeletonModel.Managers;
 using SpeechRecognition;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 
 namespace DaveFitness {
@@ -26,6 +14,7 @@ namespace DaveFitness {
 
       kinectManager = new KinectManager();
       kinectManager.Start();
+      bodyManager = new BodyManager(kinectManager);
 
       speechRecognitionManager = new SpeechRecognitionManager(kinectManager.Sensor);
       speechRecognitionManager.RecognizedCommandEventHandler += RecognizedCommand;
@@ -35,6 +24,7 @@ namespace DaveFitness {
 
       trainPanel.KinectManager = kinectManager;
       trainPanel.SpeechManager = speechRecognitionManager;
+      trainPanel.BodyManager = bodyManager;
     }
 
     private void ClosedWindow(object sender, System.EventArgs e) {
@@ -91,6 +81,7 @@ namespace DaveFitness {
     }
 
     private KinectManager kinectManager;
+    private BodyManager bodyManager;
     private SpeechRecognitionManager speechRecognitionManager;
   }
 }

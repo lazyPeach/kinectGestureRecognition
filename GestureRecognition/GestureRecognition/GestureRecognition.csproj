@@ -43,9 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BodyDeviation.cs" />
+    <Compile Include="Events\InitialPositionEventArgs.cs" />
     <Compile Include="Exceptions\GestureAlreadyExistsException.cs" />
     <Compile Include="GestureIndex.cs" />
+    <Compile Include="InitialPositionComputer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkeletonModel\SkeletonModel.csproj">
+      <Project>{8cb0115e-f384-43fb-899e-4d581687c2ad}</Project>
+      <Name>SkeletonModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

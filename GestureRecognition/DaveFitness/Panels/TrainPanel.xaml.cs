@@ -1,4 +1,5 @@
 ﻿using GestureRecognition;
+using GestureRecognition.Events;
 using GestureRecognition.Exceptions;
 using Microsoft.Kinect;
 using SkeletonModel.Events;
@@ -6,18 +7,11 @@ using SkeletonModel.Managers;
 using SpeechRecognition;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DaveFitness.Panels {
@@ -33,7 +27,31 @@ namespace DaveFitness.Panels {
       AddRectangles();
     }
 
-    private Rectangle[] timeRect;
+    public BodyManager BodyManager { set { bodyManager = value; } }
+
+    public SpeechRecognitionManager SpeechManager {
+      set {
+        speechManager = value;
+        speechManager.RecognizedCommandEventHandler += RecognizedCommand;
+      }
+    }
+
+    public KinectManager KinectManager {
+      set {
+        kinectManager = value;
+        kinectManager.KinectColorFrameEventHandler += ColorFrameHandler;
+        kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
+      }
+    }
+
+    private void UpdateGestureList(List<string> gestures) {
+      gestureList.Items.Clear();
+      foreach (string gesture in gestures) {
+        gestureList.Items.Add(gesture);
+      }
+
+      gestureList.SelectedIndex = 0;
+    }
 
     private void AddRectangles() {
       timeRect = new Rectangle[5];
@@ -49,18 +67,16 @@ namespace DaveFitness.Panels {
       }
     }
 
-    public SpeechRecognitionManager SpeechManager {
-      set {
-        speechManager = value;
-        speechManager.RecognizedCommandEventHandler += RecognizedCommand;
-      }
-    }
-
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
         case "start":
-          CountDown();
-          Console.WriteLine("start");
+          if (bodyManager != null) {
+            initialPositionComputer = new InitialPositionComputer(bodyManager);
+            initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
+
+            initialPositionComputer.Record = true;
+            StartRecordingTimer();
+          }
           break;
         case "back": // TODO
           Console.WriteLine("back");
@@ -79,35 +95,29 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private int countdownSec;
-    private Timer timer;
+    private void InitialPositionEventHandler(object sender, InitialPositionEventArgs e) {
+      Console.WriteLine("initial position");
+    }
 
-    private void CountDown() {
+    private void StartRecordingTimer() {
       countdownSec = 0;
       timer = new System.Timers.Timer { Interval = 1000 };
-      timer.Elapsed += PauseSystem;
+      timer.Elapsed += UpdateTimerBar;
       timer.Start();
     }
 
-    private void PauseSystem(object sender, System.Timers.ElapsedEventArgs e) {
-      //OnEvent(new InitialPositionEventArgs(State.Pause, ++countdownSec, false));
-      this.Dispatcher.Invoke((Action)(() => { // update label
+    private void UpdateTimerBar(object sender, ElapsedEventArgs e) {
+      this.Dispatcher.Invoke((Action)(() => { // update from any thread
         timeRect[countdownSec++].Visibility = System.Windows.Visibility.Hidden;
       }));
+
       if (countdownSec == 5) {
         timer.Stop();
+        initialPositionComputer.Record = false;
+        initialPositionComputer.ComputeInitialPosition();
         return;
       }
     }
-
-    public KinectManager KinectManager { 
-      set { 
-        kinectManager = value;
-        kinectManager.KinectColorFrameEventHandler += ColorFrameHandler;
-        kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
-      }
-    }
-
 
     private void ColorFrameHandler(object sender, KinectColorFrameEventArgs e) {
       if (pixels == null) {
@@ -186,24 +196,20 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void UpdateGestureList(List<string> gestures) {
-      gestureList.Items.Clear();
-      foreach (string gesture in gestures) {
-        gestureList.Items.Add(gesture);
-      }
-
-      gestureList.SelectedIndex = 0;
-    }
-
-    private byte[] pixels;
-    private WriteableBitmap cameraSource;
-    private KinectManager kinectManager;
-    private GestureIndex gestureIndex;
-
     private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
       Console.WriteLine((string)gestureList.SelectedItem);
     }
 
-    private SpeechRecognitionManager speechManager; 
+
+    private SpeechRecognitionManager speechManager;
+    private InitialPositionComputer initialPositionComputer;
+    private BodyManager bodyManager;
+    private Rectangle[] timeRect;
+    private byte[] pixels;
+    private WriteableBitmap cameraSource;
+    private KinectManager kinectManager;
+    private GestureIndex gestureIndex;
+    private int countdownSec;
+    private Timer timer;
   }
 }

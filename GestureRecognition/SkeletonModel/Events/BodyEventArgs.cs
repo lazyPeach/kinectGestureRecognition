@@ -1,9 +1,5 @@
 ﻿using SkeletonModel.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkeletonModel.Events {
   public class BodyEventArgs : EventArgs {
