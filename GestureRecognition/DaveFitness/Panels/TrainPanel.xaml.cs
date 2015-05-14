@@ -23,19 +23,13 @@ namespace DaveFitness.Panels {
     public TrainPanel() {
       InitializeComponent();
 
-      g = new GestureIndex();
-      g.LoadDB();
-      UpdateGestureList(g.GetAllGestures());
-    }
-    
-    private void UpdateGestureList(List<string> gestures) {
-      gestureList.Items.Clear();
-      foreach (string gesture in gestures) {
-        gestureList.Items.Add(gesture);
-      }
-
+      gestureIndex = new GestureIndex();
+      gestureIndex.LoadDB();
+      UpdateGestureList(gestureIndex.GetAllGestures());
       gestureList.SelectedIndex = 0;
     }
+    
+
 
     public KinectManager KinectManager { 
       set { 
@@ -100,18 +94,20 @@ namespace DaveFitness.Panels {
         MessageBox.Show("You have to type a gesture name");
 
       try {
-        g.AddGesture(newGestureTxt.Text);
+        gestureIndex.AddGesture(newGestureTxt.Text);
       } catch (GestureAlreadyExistsException ex) {
         MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
       }
 
-      g.SaveDB();
-      UpdateGestureList(g.GetAllGestures());
+      gestureIndex.SaveDB();
+      UpdateGestureList(gestureIndex.GetAllGestures());
       newGestureTxt.Text = "";
     }
 
     private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
-
+      gestureIndex.RemoveGesture((string)gestureList.SelectedItem);
+      gestureIndex.SaveDB();
+      UpdateGestureList(gestureIndex.GetAllGestures());
     }
 
     private void NewGestureTxtGotFocus(object sender, RoutedEventArgs e) {
@@ -121,10 +117,22 @@ namespace DaveFitness.Panels {
       }
     }
 
+    private void UpdateGestureList(List<string> gestures) {
+      gestureList.Items.Clear();
+      foreach (string gesture in gestures) {
+        gestureList.Items.Add(gesture);
+      }
+
+      gestureList.SelectedIndex = 0;
+    }
 
     private byte[] pixels;
     private WriteableBitmap cameraSource;
     private KinectManager kinectManager;
-    private GestureIndex g;
+    private GestureIndex gestureIndex;
+
+    private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+      Console.WriteLine((string)gestureList.SelectedItem);
+    }
   }
 }

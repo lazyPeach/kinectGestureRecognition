@@ -26,6 +26,13 @@ namespace GestureRecognition {
       }
     }
 
+    public void RemoveGesture(string gestureName) {
+      if (!gestureDB.ContainsKey(gestureName))
+        return;
+
+      gestureDB.Remove(gestureName);
+    }
+
     public void LoadDB() {
       string[][] db;
       XmlSerializer deserializer = new XmlSerializer(typeof(string[][]));
