@@ -72,9 +72,9 @@ namespace DaveFitness.Panels {
         case "start":
           if (bodyManager != null) {
             initialPositionComputer = new InitialPositionComputer(bodyManager);
-            initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
-
-            initialPositionComputer.Record = true;
+            gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture]);
+            gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
+            gestureRecorder.RecordInitialPosition(true);
             StartRecordingTimer();
           }
           break;
@@ -95,8 +95,14 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void InitialPositionEventHandler(object sender, InitialPositionEventArgs e) {
-      Console.WriteLine("initial position");
+    private void GestureRecordEventHandler(object sender, GestureRecordEventArgs e) {
+      this.Dispatcher.Invoke((Action)(() => { // update from any thread
+        repetitionsLbl.Content = e.StampleNr.ToString();
+      }));
+
+      if (e.StampleNr == 5) {
+        gestureIndex.SaveNewGesture();
+      }
     }
 
     private void StartRecordingTimer() {
@@ -113,8 +119,7 @@ namespace DaveFitness.Panels {
 
       if (countdownSec == 5) {
         timer.Stop();
-        initialPositionComputer.Record = false;
-        initialPositionComputer.ComputeInitialPosition();
+        gestureRecorder.RecordInitialPosition(false);
         return;
       }
     }
@@ -169,18 +174,24 @@ namespace DaveFitness.Panels {
     }
 
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
+      this.Dispatcher.Invoke((Action)(() => { // update from any thread
+        repetitionsLbl.Content = "0";
+      }));
+      
       if (newGestureTxt.Text == "")
         MessageBox.Show("You have to type a gesture name");
 
       try {
         gestureIndex.AddGesture(newGestureTxt.Text);
+        UpdateGestureList(gestureIndex.GetAllGestures());
+        newGestureTxt.Text = "";
+        newGestureTxt.IsEnabled = false;
       } catch (GestureAlreadyExistsException ex) {
         MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
       }
 
-      gestureIndex.SaveDB();
-      UpdateGestureList(gestureIndex.GetAllGestures());
-      newGestureTxt.Text = "";
+      //gestureIndex.SaveDB();
+      
     }
 
     private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
@@ -211,5 +222,6 @@ namespace DaveFitness.Panels {
     private GestureIndex gestureIndex;
     private int countdownSec;
     private Timer timer;
+    private GestureRecorder gestureRecorder;
   }
 }

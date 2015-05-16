@@ -15,6 +15,7 @@ namespace GestureRecognition {
     }
 
     public void AddGesture(string gestureName) {
+      newGesture = gestureName;
       string gestureFileName = gestureName.Replace(" ", "_");
       try {
         gestureDB.Add(gestureName, gestureFileName);
@@ -73,7 +74,15 @@ namespace GestureRecognition {
       return gestures;
     }
 
+    // todo - add some computation like dtw threshold and stuff
+    public void SaveNewGesture() {
+      SaveDB();
+    }
+
+    public string NewGesture { get { return newGesture; } }
+
     public Dictionary<string, string> GestureDB { get { return gestureDB; } set { gestureDB = value; } }
     private Dictionary<string, string> gestureDB;
+    private string newGesture;
   }
 }

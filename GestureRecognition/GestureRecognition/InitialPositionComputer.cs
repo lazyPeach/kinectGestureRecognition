@@ -9,6 +9,8 @@ using System.Collections.Generic;
 namespace GestureRecognition {
   public delegate void InitialPositionEventHandler(object sender, InitialPositionEventArgs e);
 
+  public enum InitialPositionState { Enter, Exit };
+
   public class InitialPositionComputer {
     public event InitialPositionEventHandler InitialPositionEventHandler;
 
@@ -37,16 +39,24 @@ namespace GestureRecognition {
 
     public bool Record { set { shouldRecord = value; } }
 
-
+    // InitialPosition event should be fired only when body enters in initial position or exits the
+    // initial position. To achieve this, a flag will be used to store the last known state of the 
+    // body. If the last known state is
     private void BodyEventHandler(object sender, BodyEventArgs e) {
       if (shouldRecord) {
         bodySamples.Add(e.Body);
         return;
       }
 
-      if (IsInitialPosition(e.Body)) {
-        FireEvent(new InitialPositionEventArgs());
+      if (IsInitialPosition(e.Body) && !IsInitialPosition(previousSample)) {
+        FireEvent(new InitialPositionEventArgs(InitialPositionState.Enter));
       }
+      
+      if (!IsInitialPosition(e.Body) && IsInitialPosition(previousSample)){
+        FireEvent(new InitialPositionEventArgs(InitialPositionState.Exit));
+      }
+
+      previousSample = e.Body;
     }
 
     protected virtual void FireEvent(InitialPositionEventArgs e) {
@@ -85,7 +95,7 @@ namespace GestureRecognition {
                  boneName == BoneName.ForearmLeft || boneName == BoneName.ForearmRight ||
                  boneName == BoneName.FemurusLeft || boneName == BoneName.FemurusRight ||
                  boneName == BoneName.TibiaLeft || boneName == BoneName.TibiaRight) {
-        offset = 0.05f;
+        offset = 0.1f;
       } else {
         offset = 0.1f;
       }
@@ -147,6 +157,7 @@ namespace GestureRecognition {
 
     private bool shouldRecord = false;
     private bool isInitialPositionComputed = false;
+    Body previousSample = new Body();
     private BodyManager bodyManager;
     private BodyDeviation initialPositionDeviation;
     private List<Body> bodySamples;
