@@ -72,7 +72,7 @@ namespace DaveFitness.Panels {
         case "start":
           if (bodyManager != null) {
             initialPositionComputer = new InitialPositionComputer(bodyManager);
-            gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture]);
+            gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
             gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
             gestureRecorder.RecordInitialPosition(true);
             StartRecordingTimer();

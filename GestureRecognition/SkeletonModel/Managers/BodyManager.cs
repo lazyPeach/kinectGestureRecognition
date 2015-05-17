@@ -9,7 +9,8 @@ namespace SkeletonModel.Managers {
   public delegate void BodyEventHandler(object sender, BodyEventArgs e);
 
   public class BodyManager {
-    public Body[] RecordedData { get { return recordedData.ToArray<Body>(); } }
+    public Queue<Body> RecordedData { get { return recordedData; } }
+    public Body[] RecorderDataAsArray { get { return recordedData.ToArray<Body>(); } }
 
     public event BodyEventHandler BodyEventHandler;
 
@@ -25,17 +26,18 @@ namespace SkeletonModel.Managers {
     }
 
     // serialization and deserialization of data
-    public void SaveBodyData(Stream file) {
-      XmlSerializer serializer = new XmlSerializer(typeof(Queue<Body>));
-      TextWriter textWriter = new StreamWriter(file);
-      serializer.Serialize(textWriter, recordedData);
+    public void SaveBodyData(string filePath) {
+      XmlSerializer serializer = new XmlSerializer(typeof(Body[]));
+      TextWriter textWriter = new StreamWriter(filePath);
+      serializer.Serialize(textWriter, recordedData.ToArray<Body>());
       textWriter.Close();
     }
 
-    public void LoadBodyData(Stream file) {
-      XmlSerializer deserializer = new XmlSerializer(typeof(Queue<Body>));
-      TextReader textReader = new StreamReader(file);
-      recordedData = (Queue<Body>)deserializer.Deserialize(textReader);
+    public void LoadBodyData(string filePath) {
+      XmlSerializer deserializer = new XmlSerializer(typeof(Body[]));
+      TextReader textReader = new StreamReader(filePath);
+      Body[] temp = (Body[])deserializer.Deserialize(textReader);
+      recordedData = new Queue<Body>(temp);
       textReader.Close();
     }
 

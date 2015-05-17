@@ -26,12 +26,12 @@ namespace GestureRecognition.DynamicTimeWarp {
     public float[][] ReferenceSignal { get { return referenceSignal; } set { referenceSignal = value; } }
     public float[][] RecordSignal { get { return recordSignal; } set { recordSignal = value; } }
     public float[][][] Matrix { get { return matrix; } set { matrix = value; } }
-    public float BestCost { get { return bestCost; } set { bestCost = value; } }
+    public float[] BestCost { get { return bestCost; } set { bestCost = value; } }
 
     private BoneName boneName;
     private float[][] referenceSignal = new float[4][];
     private float[][] recordSignal = new float[4][];
     private float[][][] matrix = new float[4][][];
-    private float bestCost = 0;
+    private float[] bestCost = new float[4];
   }
 }

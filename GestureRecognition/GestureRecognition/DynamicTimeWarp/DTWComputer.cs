@@ -20,6 +20,15 @@ namespace GestureRecognition.DynamicTimeWarp {
         result.Data[Mapper.BoneIndexMap[boneName]].Matrix =
             ComputeDTWMatrix(result.Data[Mapper.BoneIndexMap[boneName]].ReferenceSignal,
             result.Data[Mapper.BoneIndexMap[boneName]].RecordSignal);
+
+        result.Data[Mapper.BoneIndexMap[boneName]].BestCost[0] =
+          result.Data[Mapper.BoneIndexMap[boneName]].Matrix[0][reference.Length - 1][record.Length - 1];
+        result.Data[Mapper.BoneIndexMap[boneName]].BestCost[1] =
+          result.Data[Mapper.BoneIndexMap[boneName]].Matrix[1][reference.Length - 1][record.Length - 1];
+        result.Data[Mapper.BoneIndexMap[boneName]].BestCost[2] =
+          result.Data[Mapper.BoneIndexMap[boneName]].Matrix[2][reference.Length - 1][record.Length - 1];
+        result.Data[Mapper.BoneIndexMap[boneName]].BestCost[3] =
+          result.Data[Mapper.BoneIndexMap[boneName]].Matrix[3][reference.Length - 1][record.Length - 1];
       }
     }
 
@@ -45,9 +54,33 @@ namespace GestureRecognition.DynamicTimeWarp {
             }
           }
         }
+
+        res[i][0][0] = 0;
+
+        for (int j = 1; j < reference[i].Length; j++) {
+          res[i][j][0] += res[i][j - 1][0];
+        }
+
+        for (int k = 1; k < record[i].Length; k++) {
+          res[i][0][k] += res[i][0][k - 1];
+        }
+
+        for (int j = 2; j < reference[i].Length; j++) {
+          for (int k = 2; k < record[i].Length; k++) {
+            res[i][j][k] += GetMin(res[i][j-1][k], res[i][j][k-1], res[i][j-1][k-1]);
+          }
+        }
+
       }
 
       return res;
+    }
+
+    private float GetMin(float x, float y, float z) {
+      if (x <= y && x <= z) return x;
+      if (y <= x && y <= z) return y;
+      if (z <= x && z <= y) return z;
+      return 0;
     }
 
     private float[][] GetRawSignal(Body[] bodySignal, BoneName boneName) {

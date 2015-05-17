@@ -44,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BodyDeviation.cs" />
+    <Compile Include="DynamicTimeWarp\DTWComputer.cs" />
+    <Compile Include="DynamicTimeWarp\DTWData.cs" />
+    <Compile Include="DynamicTimeWarp\DTWResult.cs" />
     <Compile Include="Events\GestureRecordEventArgs.cs" />
     <Compile Include="Events\InitialPositionEventArgs.cs" />
     <Compile Include="Exceptions\GestureAlreadyExistsException.cs" />

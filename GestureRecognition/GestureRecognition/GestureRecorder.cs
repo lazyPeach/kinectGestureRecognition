@@ -17,7 +17,7 @@ namespace GestureRecognition {
     public event GestureRecordEventHandler GestureRecordEventHandler;
 
     public GestureRecorder(BodyManager bodyManager, InitialPositionComputer initialComputer, string gestureFileName) {
-      record = new Queue<Body>();
+      //record = new Queue<Body>();
       this.bodyManager = bodyManager;
       this.initialComputer = initialComputer;
       this.gestureFileName = gestureFileName;
@@ -28,10 +28,11 @@ namespace GestureRecognition {
         initialComputer.Record = true;  // start recording
       } else {
         initialComputer.Record = false; // stop recording
+        bodyManager.ClearBodyData();
         initialComputer.ComputeInitialPosition();
         initialComputer.InitialPositionEventHandler += InitialPositionEventHandler;
         //start listen to body events
-        bodyManager.BodyEventHandler += BodyEventHandler;
+        //bodyManager.BodyEventHandler += BodyEventHandler;
       }
     }
 
@@ -46,21 +47,22 @@ namespace GestureRecognition {
     }
 
     private void RecordSample() {
-      record = new Queue<Body>();
-      shouldRecord = true;
+      bodyManager.ClearBodyData();
+      //record = new Queue<Body>();
+      //shouldRecord = true;
     }
 
+    // use serializer from body manager instead of this shit
     private void ProcessSample() {
-      shouldRecord = false;
-      if (record.Count > 50) { // consider each gesture with less than 50 samples incorrect
-        XmlSerializer serializer = new XmlSerializer(typeof(Body[]));
-        using (TextWriter textWriter = new StreamWriter(@"..\..\..\..\database\" + gestureFileName + samplesCount + ".xml")) {
-          serializer.Serialize(textWriter, record.ToArray());
-          textWriter.Close();
-        }
+      //shouldRecord = false;
+      if (bodyManager.RecordedData.Count > 50) { // consider each gesture with less than 50 samples incorrect
+        //XmlSerializer serializer = new XmlSerializer(typeof(Queue<Body>));
+        string filePath = @"..\..\..\..\database\" + gestureFileName + samplesCount + ".xml";
+        bodyManager.SaveBodyData(filePath);
+        
 
         if (++samplesCount == 5) {
-          bodyManager.BodyEventHandler -= BodyEventHandler;
+          //bodyManager.BodyEventHandler -= BodyEventHandler;
           initialComputer.InitialPositionEventHandler -= InitialPositionEventHandler;
         }
 
@@ -74,18 +76,18 @@ namespace GestureRecognition {
       }
     }
 
-    private void BodyEventHandler(object sender, BodyEventArgs e) {
-      Body body = e.Body;
-      if (shouldRecord) {
-        record.Enqueue(body);
-      }
-    }
+    //private void BodyEventHandler(object sender, BodyEventArgs e) {
+    //  Body body = e.Body;
+    //  if (shouldRecord) {
+    //    record.Enqueue(body);
+    //  }
+    //}
 
-    private bool shouldRecord = false;
+    //private bool shouldRecord = false;
     private int samplesCount = 0;
     private BodyManager bodyManager;
     private InitialPositionComputer initialComputer;
     private string gestureFileName;
-    private Queue<Body> record;
+    //private Queue<Body> record;
   }
 }
