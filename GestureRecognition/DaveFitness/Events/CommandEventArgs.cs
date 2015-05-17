@@ -5,9 +5,6 @@ namespace DaveFitness.Events {
     Exercise,
     Train,
     Test,
-    Start,
-    Stop,
-    Back
   }
 
   public class CommandEventArgs : EventArgs {

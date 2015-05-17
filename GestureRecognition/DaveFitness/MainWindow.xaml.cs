@@ -6,11 +6,13 @@ using System.Windows;
 
 
 namespace DaveFitness {
+  enum FocusedPanel { Main, Test, Train, Exercise }
+  public enum VoiceCommand { Exercise, Train, Test, Back, Start, Up, Down, Select }
+
   public partial class MainWindow : Window {
     public MainWindow() {
       InitializeComponent();
       this.Closed += ClosedWindow;
-
 
       kinectManager = new KinectManager();
       kinectManager.Start();
@@ -19,43 +21,85 @@ namespace DaveFitness {
       speechRecognitionManager = new SpeechRecognitionManager(kinectManager.Sensor);
       speechRecognitionManager.RecognizedCommandEventHandler += RecognizedCommand;
 
-      mainPanel.SpeechManager = speechRecognitionManager;
       mainPanel.CommandEventHandler += MainPanelCommand;
 
       trainPanel.KinectManager = kinectManager;
-      trainPanel.SpeechManager = speechRecognitionManager;
+      //trainPanel.SpeechManager = speechRecognitionManager;
       trainPanel.BodyManager = bodyManager;
+
+      focusedPanel = FocusedPanel.Main;
     }
 
     private void ClosedWindow(object sender, System.EventArgs e) {
       kinectManager.Stop();
     }
 
+    // refactor: change pannels from here... don't expect events from main panel
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
         case "exercise":
-          Console.WriteLine("exercise");
+          if (focusedPanel == FocusedPanel.Main) {
+            ChangeFocus(FocusedPanel.Exercise);
+          }
           break;
         case "train":
-          Console.WriteLine("train");
+          if (focusedPanel == FocusedPanel.Main) {
+            ChangeFocus(FocusedPanel.Train);
+          }
           break;
         case "test":
-          Console.WriteLine("test");
-          break;
-        case "start":
-          Console.WriteLine("start");
+          if (focusedPanel == FocusedPanel.Main) {
+            ChangeFocus(FocusedPanel.Test);
+          }
           break;
         case "back":
-          Console.WriteLine("back");
+          focusedPanel = FocusedPanel.Main;
+          exercisePanel.Visibility = System.Windows.Visibility.Hidden;
+          trainPanel.Visibility = System.Windows.Visibility.Hidden;
+          testPanel.Visibility = System.Windows.Visibility.Hidden;
+          break;
+        case "start":
+          RedirectVoiceCommand(VoiceCommand.Start);
           break;
         case "up":
-          Console.WriteLine("up");
+          RedirectVoiceCommand(VoiceCommand.Up);
           break;
         case "down":
-          Console.WriteLine("down");
+          RedirectVoiceCommand(VoiceCommand.Down);
           break;
         case "select":
-          Console.WriteLine("select");
+          RedirectVoiceCommand(VoiceCommand.Select);
+          break;
+      }
+    }
+
+    private void RedirectVoiceCommand(VoiceCommand command) {
+      switch (focusedPanel) {
+        case FocusedPanel.Train:
+          trainPanel.ExecuteVoiceCommand(command);
+          break;
+      }
+    }
+
+    private void ChangeFocus(FocusedPanel newFocusedPanel) {
+      focusedPanel = newFocusedPanel;
+      switch (focusedPanel) {
+        case FocusedPanel.Exercise:
+          exercisePanel.Visibility = System.Windows.Visibility.Visible;
+          trainPanel.Visibility = System.Windows.Visibility.Hidden;
+          testPanel.Visibility = System.Windows.Visibility.Hidden;
+          break;
+        case FocusedPanel.Train:
+          exercisePanel.Visibility = System.Windows.Visibility.Hidden;
+          trainPanel.Visibility = System.Windows.Visibility.Visible;
+          testPanel.Visibility = System.Windows.Visibility.Hidden;
+          break;
+        case FocusedPanel.Test:
+          exercisePanel.Visibility = System.Windows.Visibility.Hidden;
+          trainPanel.Visibility = System.Windows.Visibility.Hidden;
+          testPanel.Visibility = System.Windows.Visibility.Visible;
+          break;
+        case FocusedPanel.Main:
           break;
       }
     }
@@ -63,16 +107,19 @@ namespace DaveFitness {
     private void MainPanelCommand(object sender, CommandEventArgs e) {
       switch (e.Command) {
         case Command.Exercise:
+          focusedPanel = FocusedPanel.Exercise;
           exercisePanel.Visibility = System.Windows.Visibility.Visible;
           trainPanel.Visibility = System.Windows.Visibility.Hidden;
           testPanel.Visibility = System.Windows.Visibility.Hidden;
           break;
         case Command.Train:
+          focusedPanel = FocusedPanel.Train;
           exercisePanel.Visibility = System.Windows.Visibility.Hidden;
           trainPanel.Visibility = System.Windows.Visibility.Visible;
           testPanel.Visibility = System.Windows.Visibility.Hidden;
           break;
         case Command.Test:
+          focusedPanel = FocusedPanel.Test;
           exercisePanel.Visibility = System.Windows.Visibility.Hidden;
           trainPanel.Visibility = System.Windows.Visibility.Hidden;
           testPanel.Visibility = System.Windows.Visibility.Visible;
@@ -83,5 +130,6 @@ namespace DaveFitness {
     private KinectManager kinectManager;
     private BodyManager bodyManager;
     private SpeechRecognitionManager speechRecognitionManager;
+    private FocusedPanel focusedPanel;
   }
 }

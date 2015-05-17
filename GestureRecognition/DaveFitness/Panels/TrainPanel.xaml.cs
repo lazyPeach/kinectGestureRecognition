@@ -29,12 +29,12 @@ namespace DaveFitness.Panels {
 
     public BodyManager BodyManager { set { bodyManager = value; } }
 
-    public SpeechRecognitionManager SpeechManager {
-      set {
-        speechManager = value;
-        speechManager.RecognizedCommandEventHandler += RecognizedCommand;
-      }
-    }
+    //public SpeechRecognitionManager SpeechManager {
+    //  set {
+    //    speechManager = value;
+        //speechManager.RecognizedCommandEventHandler += RecognizedCommand;
+    //  }
+    //}
 
     public KinectManager KinectManager {
       set {
@@ -67,9 +67,9 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
-      switch (e.RecognizedCommand) {
-        case "start":
+    public void ExecuteVoiceCommand(VoiceCommand command) {
+      switch (command) {
+        case VoiceCommand.Start:
           if (bodyManager != null) {
             initialPositionComputer = new InitialPositionComputer(bodyManager);
             gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
@@ -78,18 +78,15 @@ namespace DaveFitness.Panels {
             StartRecordingTimer();
           }
           break;
-        case "back": // TODO
-          Console.WriteLine("back");
-          break;
-        case "up":
+        case VoiceCommand.Up:
           if (gestureList.SelectedIndex > 0)
             gestureList.SelectedIndex--;
           break;
-        case "down":
+        case VoiceCommand.Down:
           if (gestureList.SelectedIndex < gestureList.Items.Count)
             gestureList.SelectedIndex++;
           break;
-        case "select": //TODO
+        case VoiceCommand.Select: //TODO
           Console.WriteLine("select");
           break;
       }
@@ -212,7 +209,7 @@ namespace DaveFitness.Panels {
     }
 
 
-    private SpeechRecognitionManager speechManager;
+    //private SpeechRecognitionManager speechManager;
     private InitialPositionComputer initialPositionComputer;
     private BodyManager bodyManager;
     private Rectangle[] timeRect;

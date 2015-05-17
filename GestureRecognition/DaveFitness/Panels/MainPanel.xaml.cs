@@ -14,35 +14,6 @@ namespace DaveFitness.Panels {
       InitializeComponent();
     }
 
-    public SpeechRecognitionManager SpeechManager {
-      set {
-        speechManager = value;
-        speechManager.RecognizedCommandEventHandler += RecognizedCommand;
-      }
-    }
-
-    private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
-      ClearLabelsBackground();
-
-      switch (e.RecognizedCommand) {
-        case "exercise":
-          ClearLabelsBackground();
-          HighlightLabel(ExerciseLbl);
-          FireEvent(new CommandEventArgs(Command.Exercise));
-          break;
-        case "train":
-          ClearLabelsBackground();
-          HighlightLabel(TrainLbl);
-          FireEvent(new CommandEventArgs(Command.Train));
-          break;
-        case "test":
-          ClearLabelsBackground();
-          HighlightLabel(TestLbl);
-          FireEvent(new CommandEventArgs(Command.Test));
-          break;
-      }
-    }
-
     protected virtual void FireEvent(CommandEventArgs e) {
       if (CommandEventHandler != null) {
         CommandEventHandler(this, e);
@@ -101,8 +72,5 @@ namespace DaveFitness.Panels {
     private void TestLblMouseClick(object sender, MouseButtonEventArgs e) {
       FireEvent(new CommandEventArgs(Command.Test));
     }
-
-
-    private SpeechRecognitionManager speechManager; 
   }
 }
