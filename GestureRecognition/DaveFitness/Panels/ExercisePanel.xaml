@@ -6,6 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1300">
     <Grid Background="Wheat">
-            
-    </Grid>
+    <Button Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+
+  </Grid>
 </UserControl>
