@@ -24,8 +24,10 @@ namespace DaveFitness {
       mainPanel.CommandEventHandler += MainPanelCommand;
 
       trainPanel.KinectManager = kinectManager;
-      //trainPanel.SpeechManager = speechRecognitionManager;
       trainPanel.BodyManager = bodyManager;
+
+      exercisePanel.KinectManager = kinectManager;
+      exercisePanel.BodyManager = bodyManager;
 
       focusedPanel = FocusedPanel.Main;
     }
@@ -77,6 +79,9 @@ namespace DaveFitness {
       switch (focusedPanel) {
         case FocusedPanel.Train:
           trainPanel.ExecuteVoiceCommand(command);
+          break;
+        case FocusedPanel.Exercise:
+          exercisePanel.ExecuteVoiceCommand(command);
           break;
       }
     }

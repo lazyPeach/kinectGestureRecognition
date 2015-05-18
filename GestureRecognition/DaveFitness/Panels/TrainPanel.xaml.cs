@@ -28,14 +28,7 @@ namespace DaveFitness.Panels {
     }
 
     public BodyManager BodyManager { set { bodyManager = value; } }
-
-    //public SpeechRecognitionManager SpeechManager {
-    //  set {
-    //    speechManager = value;
-        //speechManager.RecognizedCommandEventHandler += RecognizedCommand;
-    //  }
-    //}
-
+    
     public KinectManager KinectManager {
       set {
         kinectManager = value;
@@ -186,9 +179,6 @@ namespace DaveFitness.Panels {
       } catch (GestureAlreadyExistsException ex) {
         MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
       }
-
-      //gestureIndex.SaveDB();
-      
     }
 
     private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
@@ -208,9 +198,8 @@ namespace DaveFitness.Panels {
       Console.WriteLine((string)gestureList.SelectedItem);
     }
 
-
-    //private SpeechRecognitionManager speechManager;
     private InitialPositionComputer initialPositionComputer;
+    private GestureRecorder gestureRecorder;
     private BodyManager bodyManager;
     private Rectangle[] timeRect;
     private byte[] pixels;
@@ -219,6 +208,5 @@ namespace DaveFitness.Panels {
     private GestureIndex gestureIndex;
     private int countdownSec;
     private Timer timer;
-    private GestureRecorder gestureRecorder;
   }
 }

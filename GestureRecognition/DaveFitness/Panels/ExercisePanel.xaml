@@ -5,8 +5,33 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1300">
-    <Grid Background="Wheat">
-    <Button Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+  <Grid>
+    <Grid.Background>
+      <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+        <GradientStop Color="Black" Offset="1"/>
+        <GradientStop Color="#FFCCFF00"/>
+        <GradientStop Color="#FFA0FD7D" Offset="0.815"/>
+      </LinearGradientBrush>
+    </Grid.Background>
 
+    <Image Name="cameraFrame" HorizontalAlignment="Left" Height="360" Margin="10,10,0,0" VerticalAlignment="Top" Width="480"/>
+    <Image Name="skeletonFrame" HorizontalAlignment="Left" Height="360" Margin="10,10,0,0" VerticalAlignment="Top" Width="480"/>
+
+    <ListBox Name="gestureList" HorizontalAlignment="Left" Height="580" Margin="990,10,0,0" VerticalAlignment="Top" Width="300" SelectionChanged="gestureList_SelectionChanged"/>
+
+    <Label Content="Time" Foreground="White" HorizontalAlignment="Left" Margin="10,495,0,0" VerticalAlignment="Top" Height="50" Width="90" FontSize="30" FontWeight="Bold"/>
+
+    <Label Content="Repetitions" Foreground="White" HorizontalAlignment="Left" Margin="330,495,0,0" VerticalAlignment="Top" Height="50" Width="170" FontSize="30" FontWeight="Bold"/>
+    <Label Name="repetitionsLbl" Content="" Foreground="White" HorizontalAlignment="Left" Margin="505,495,0,0" VerticalAlignment="Top" Height="50" Width="50" FontSize="30" FontWeight="Bold"/>
+    <Grid Name="timerGrid" HorizontalAlignment="Left" Height="50" Margin="105,500,0,0" VerticalAlignment="Top" Width="150">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="30"/>
+        <ColumnDefinition Width="30"/>
+        <ColumnDefinition Width="30"/>
+        <ColumnDefinition Width="30"/>
+        <ColumnDefinition Width="30"/>
+      </Grid.ColumnDefinitions>
+    </Grid>
+    <Canvas Name="sampleGestureCanvas" Background="Black" HorizontalAlignment="Left" Height="360" Margin="505,10,0,0" VerticalAlignment="Top" Width="480"/>
   </Grid>
 </UserControl>
