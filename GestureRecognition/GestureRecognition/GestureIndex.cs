@@ -9,6 +9,7 @@ using System.IO;
 using System.Xml.Serialization;
 
 namespace GestureRecognition {
+  // filename is actually a part of the filename to which a number is appended
   public struct GestureData {
     public string name;
     public string fileName;
@@ -36,6 +37,7 @@ namespace GestureRecognition {
       try {
         gestureDB.Add(gestureName, gesture);
       } catch (Exception ex) {
+        Console.WriteLine(ex.Message);
         throw new GestureAlreadyExistsException(gestureName);
       }
     }
@@ -94,6 +96,7 @@ namespace GestureRecognition {
       SaveDB();
     }
 
+    // to refactor
     private float ComputeDTWThreshold() {
       float maxSum = 0;
       List<string> files = new List<string>();
@@ -107,7 +110,6 @@ namespace GestureRecognition {
       DTWComputer computer = new DTWComputer();
 
       for (int i = 0; i < files.Count; i++) {
-        
         BodyManager reference = new BodyManager();
         reference.LoadBodyData(files[i]);
         

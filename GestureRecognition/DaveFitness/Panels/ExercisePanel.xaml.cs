@@ -20,6 +20,8 @@ namespace DaveFitness.Panels {
 
       gestureIndex = new GestureIndex();
       gestureIndex.LoadDB();
+      gestureDetector = new GestureDetector(gestureIndex);
+
       UpdateGestureList(gestureIndex.GetAllGestures());
       gestureList.SelectedIndex = 0;
 
@@ -43,15 +45,14 @@ namespace DaveFitness.Panels {
 
     public void ExecuteVoiceCommand(VoiceCommand command) {
       switch (command) {
-        //  case VoiceCommand.Start:
-        //    if (bodyManager != null) {
-        //      initialPositionComputer = new InitialPositionComputer(bodyManager);
-        //      gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
-        //      gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
-        //      gestureRecorder.RecordInitialPosition(true);
-        //      StartRecordingTimer();
-        //    }
-        //    break;
+        case VoiceCommand.Start:
+          if (bodyManager != null) {
+            initialPositionComputer = new InitialPositionComputer(bodyManager);
+            //initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
+            RecordInitialPosition(true);
+            StartRecordingTimer();
+          }
+          break;
         case VoiceCommand.Up:
           if (gestureList.SelectedIndex > 0)
             gestureList.SelectedIndex--;
@@ -63,6 +64,36 @@ namespace DaveFitness.Panels {
         //  case VoiceCommand.Select: //TODO
         //    Console.WriteLine("select");
         //    break;
+      }
+    }
+
+    // move this in gesture detector?
+    private void InitialPositionEventHandler(object sender, InitialPositionEventArgs e) {
+      if (e.PositionState == InitialPositionState.Enter) {
+        // check if correct gesture -> send to GestureDetector the gesture name, the gestureIndex
+        // and the data accumulated in the body manager.
+        Console.WriteLine("enter init pos");
+        if (bodyManager.RecordedData.Count > 50) { // consider each gesture with less than 50 samples incorrect
+          // change this such that each gesture performed by user to be saved in a separate file
+          // maybe append the time at which the gesture ended
+          string gestureName = (string)gestureList.SelectedItem;
+          if (gestureDetector.IsCorrectGesture(gestureName, bodyManager.RecorderDataAsArray)) {
+            Console.WriteLine("correct gesture");
+          } else {
+            Console.WriteLine("incorrect gesture");
+          }
+        }
+      }
+
+      if (e.PositionState == InitialPositionState.Exit) {
+        Console.WriteLine("exit init pos");
+
+        // record the new gesture -> clear body data and don't do anything else. bodymanager pushes
+        // any new body sample into a queue so if one clears the body data when the user is no more
+        // in initial position, when it will enter back into the initial position, body manager will
+        // contain only the last performed gesture
+        bodyManager.ClearBodyData();
+
       }
     }
 
@@ -100,6 +131,17 @@ namespace DaveFitness.Panels {
       }
     }
 
+    private void RecordInitialPosition(bool rec = false) {
+      if (rec) {
+        initialPositionComputer.Record = true;  // start recording
+      } else {
+        initialPositionComputer.Record = false; // stop recording
+        bodyManager.ClearBodyData();
+        initialPositionComputer.ComputeInitialPosition();
+        initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
+      }
+    }
+
     private void StartRecordingTimer() {
       countdownSec = 0;
       timer = new System.Timers.Timer { Interval = 1000 };
@@ -114,7 +156,7 @@ namespace DaveFitness.Panels {
 
       if (countdownSec == 5) {
         timer.Stop();
-        gestureRecorder.RecordInitialPosition(false);
+        RecordInitialPosition(false);
         return;
       }
     }
@@ -239,7 +281,6 @@ namespace DaveFitness.Panels {
     private Body[] selectedGestureSamples;
     private InitialPositionComputer initialPositionComputer;
     private GestureIndex gestureIndex;
-    private GestureRecorder gestureRecorder;
     private BodyManager bodyManager;
     private byte[] pixels;
     private WriteableBitmap cameraSource;
@@ -250,5 +291,6 @@ namespace DaveFitness.Panels {
     private Rectangle[] timeRect;
     private int centerX = 0;
     private int centerY = 0;
+    private GestureDetector gestureDetector;
   }
 }
