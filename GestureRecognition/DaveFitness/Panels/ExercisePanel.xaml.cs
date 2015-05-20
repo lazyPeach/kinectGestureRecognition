@@ -48,7 +48,6 @@ namespace DaveFitness.Panels {
         case VoiceCommand.Start:
           if (bodyManager != null) {
             initialPositionComputer = new InitialPositionComputer(bodyManager);
-            //initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
             RecordInitialPosition(true);
             StartRecordingTimer();
           }
@@ -61,9 +60,10 @@ namespace DaveFitness.Panels {
           if (gestureList.SelectedIndex < gestureList.Items.Count)
             gestureList.SelectedIndex++;
           break;
-        //  case VoiceCommand.Select: //TODO
-        //    Console.WriteLine("select");
-        //    break;
+        case VoiceCommand.Select: //TODO
+          //Console.WriteLine("select");
+          //PlotFeedback();
+          break;
       }
     }
 
@@ -81,6 +81,8 @@ namespace DaveFitness.Panels {
             Console.WriteLine("correct gesture");
           } else {
             Console.WriteLine("incorrect gesture");
+            PlotFeedback(gestureDetector.ClosestSample.RecorderDataAsArray, bodyManager.RecorderDataAsArray);
+            // now you should give feedback... you have the recorded gesture in body
           }
         }
       }
@@ -96,6 +98,100 @@ namespace DaveFitness.Panels {
 
       }
     }
+
+    private void PlotFeedback(Body[] reference, Body[] record) {
+      gestureTimer.Elapsed -= UpdateGesturePlayer;
+      gestureTimer.Stop();
+      initialPositionComputer.InitialPositionEventHandler -= InitialPositionEventHandler;
+      referenceGesture = reference;
+      recordedGesture = record;
+      
+      this.Dispatcher.Invoke((Action)(() => { // update from any thread
+        sampleGestureCanvas.Height = 580;
+        sampleGestureCanvas.Width = 640;
+        PlayReferenceGesture();
+      }));
+      //gestureTimer.Start();
+      //initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
+
+      Console.WriteLine("enough");
+
+    }
+
+    private void PlayReferenceGesture() {
+      feedbackTimer = new System.Timers.Timer { Interval = 40 };
+      feedbackTimer.Elapsed += UpdateFeedback;
+      feedbackTimer.Start();
+    }
+
+    private int recordIndex = 0;
+    private int referenceIndex = 0;
+    private Timer feedbackTimer;
+
+    private void UpdateFeedback(object sender, ElapsedEventArgs e) {
+      if (recordedGesture != null && referenceGesture != null) {
+        this.Dispatcher.Invoke((Action)(() => { // update from any thread
+          DrawFeedbackSkeleton(recordedGesture[recordIndex++], referenceGesture[referenceIndex++]);
+        }));
+      }
+
+      // play last sample until both are at the end
+      if (recordIndex == recordedGesture.Length && referenceIndex == referenceGesture.Length) {
+        feedbackTimer.Elapsed -= UpdateFeedback;
+        feedbackTimer.Stop();
+        this.Dispatcher.Invoke((Action)(() => { // update from any thread
+          sampleGestureCanvas.Height = 360;
+          sampleGestureCanvas.Width = 480;
+          
+        }));
+        
+        return;
+      }
+      
+      if (recordIndex == recordedGesture.Length) {
+        recordIndex--;
+      }
+
+      if (referenceIndex == referenceGesture.Length) {
+        referenceIndex--;
+      }
+    }
+
+    private void DrawFeedbackSkeleton(Body reference, Body record) {
+      sampleGestureCanvas.Children.Clear();
+
+      SkeletonModel.Model.Joint centerReferenceJoint = reference.JointSkeleton.GetJoint(JointName.HipCenter);
+      SkeletonModel.Model.Joint centerRecordJoint = record.JointSkeleton.GetJoint(JointName.HipCenter);
+
+      DrawPoint(centerX, centerY);
+      DrawRedPoint(centerX, centerY);
+
+      foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
+        SkeletonModel.Model.Joint joint = reference.JointSkeleton.GetJoint(jointType);
+
+        if (joint == null) continue;
+
+        double x = joint.XCoord - centerReferenceJoint.XCoord;
+        double y = joint.YCoord - centerReferenceJoint.YCoord;
+
+        DrawPoint(centerX + x * 200, centerY - y * 200); // have a mirror display
+      }
+
+      foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
+        SkeletonModel.Model.Joint joint = record.JointSkeleton.GetJoint(jointType);
+
+        if (joint == null) continue;
+
+        double x = joint.XCoord - centerRecordJoint.XCoord;
+        double y = joint.YCoord - centerRecordJoint.YCoord;
+
+        DrawRedPoint(centerX + x * 200, centerY - y * 200); // have a mirror display
+      }
+    }
+
+    
+    
+
 
     private void UpdateGestureList(List<string> gestures) {
       gestureList.Items.Clear();
@@ -117,17 +213,6 @@ namespace DaveFitness.Panels {
         timeRect[i].Fill = fillBrush;
         timerGrid.Children.Add(timeRect[i]);
         Grid.SetColumn(timeRect[i], i);
-      }
-    }
-
-
-    private void GestureRecordEventHandler(object sender, GestureRecordEventArgs e) {
-      this.Dispatcher.Invoke((Action)(() => { // update from any thread
-        repetitionsLbl.Content = e.StampleNr.ToString();
-      }));
-
-      if (e.StampleNr == 5) {
-        gestureIndex.SaveNewGesture();
       }
     }
 
@@ -248,6 +333,18 @@ namespace DaveFitness.Panels {
       DrawSampleGestureJoints(body.JointSkeleton);
     }
 
+    private void DrawRedPoint(double x, double y) {
+      Ellipse point = new Ellipse {
+        Width = 5,
+        Height = 5,
+        Fill = new SolidColorBrush(Colors.Red)
+      };
+
+      Canvas.SetLeft(point, x - point.Width / 2);
+      Canvas.SetTop(point, y - point.Height / 2);
+      sampleGestureCanvas.Children.Add(point);
+    }
+
     private void DrawPoint(double x, double y) {
       Ellipse point = new Ellipse {
         Width = 10,
@@ -278,6 +375,8 @@ namespace DaveFitness.Panels {
     }
 
     private int gestureSampleIndex;
+    private Body[] referenceGesture;
+    private Body[] recordedGesture;
     private Body[] selectedGestureSamples;
     private InitialPositionComputer initialPositionComputer;
     private GestureIndex gestureIndex;

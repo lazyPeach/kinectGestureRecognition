@@ -46,12 +46,22 @@ namespace GestureRecognition {
 
         // we need a confidence threshold... getting the max difference between samples is not 
         // the best solution... for now * 2 seems to work
-        if (sum < gestureData.threshold * 2) return true;
+        if (sum < gestureData.threshold * 2) {
+          closestSample = reference;
+          return true;
+        }
       }
+
+      closestSample = new BodyManager();
+      closestSample.LoadBodyData(files[0]);
 
       return false;
     }
 
+    public BodyManager ClosestSample { get { return closestSample; } }
+
+
     private GestureIndex gestureIndex;
+    private BodyManager closestSample;
   }
 }
