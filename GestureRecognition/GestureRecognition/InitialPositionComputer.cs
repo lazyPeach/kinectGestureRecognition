@@ -157,7 +157,7 @@ namespace GestureRecognition {
 
     private bool shouldRecord = false;
     private bool isInitialPositionComputed = false;
-    Body previousSample = new Body();
+    private Body previousSample = new Body();
     private BodyManager bodyManager;
     private BodyDeviation initialPositionDeviation;
     private List<Body> bodySamples;

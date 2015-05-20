@@ -10,7 +10,7 @@ namespace SkeletonModel.Managers {
 
   public class BodyManager {
     public Queue<Body> RecordedData { get { return recordedData; } }
-    public Body[] RecorderDataAsArray { get { return recordedData.ToArray<Body>(); } }
+    public Body[] RecordedDataAsArray { get { return recordedData.ToArray<Body>(); } }
 
     public event BodyEventHandler BodyEventHandler;
 
