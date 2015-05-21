@@ -40,36 +40,44 @@ namespace DaveFitness {
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
         case "exercise":
+          Console.WriteLine("exercise");
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Exercise);
           }
           break;
         case "train":
+          Console.WriteLine("train");
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Train);
           }
           break;
         case "test":
+          Console.WriteLine("test");
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Test);
           }
           break;
         case "back":
+          Console.WriteLine("back");
           focusedPanel = FocusedPanel.Main;
           exercisePanel.Visibility = System.Windows.Visibility.Hidden;
           trainPanel.Visibility = System.Windows.Visibility.Hidden;
           testPanel.Visibility = System.Windows.Visibility.Hidden;
           break;
         case "start":
+          Console.WriteLine("start");
           RedirectVoiceCommand(VoiceCommand.Start);
           break;
         case "up":
+          Console.WriteLine("up");
           RedirectVoiceCommand(VoiceCommand.Up);
           break;
         case "down":
+          Console.WriteLine("down");
           RedirectVoiceCommand(VoiceCommand.Down);
           break;
         case "select":
+          Console.WriteLine("select5");
           RedirectVoiceCommand(VoiceCommand.Select);
           break;
       }

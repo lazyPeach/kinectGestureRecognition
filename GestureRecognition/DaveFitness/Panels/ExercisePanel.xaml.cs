@@ -4,6 +4,7 @@ using Microsoft.Kinect;
 using SkeletonModel.Events;
 using SkeletonModel.Managers;
 using SkeletonModel.Model;
+using SkeletonModel.Util;
 using System;
 using System.Collections.Generic;
 using System.Timers;
@@ -105,7 +106,7 @@ namespace DaveFitness.Panels {
 
     private void DrawSampleGestureSkeleton(Body body) {
       DrawSampleGestureJoints(body.JointSkeleton);
-      //draw bones
+      DrawSampleGestureBones(body.JointSkeleton);
     }
 
     private void DrawSampleGestureJoints(JointSkeleton jointSkeleton) {
@@ -126,6 +127,25 @@ namespace DaveFitness.Panels {
       }
     }
 
+    private void DrawSampleGestureBones(JointSkeleton jointSkeleton) {
+      SkeletonModel.Model.Joint centerJoint = jointSkeleton.GetJoint(JointName.HipCenter);
+
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        Tuple<JointName, JointName> boneExtremities = Mapper.BoneJointMap[boneName];
+        SkeletonModel.Model.Joint startJoint = jointSkeleton.GetJoint(boneExtremities.Item1);
+        SkeletonModel.Model.Joint endJoint = jointSkeleton.GetJoint(boneExtremities.Item2);
+
+        if (startJoint == null || endJoint == null) continue;
+
+        double x1 = startJoint.XCoord - centerJoint.XCoord;
+        double y1 = startJoint.YCoord - centerJoint.YCoord;
+        double x2 = endJoint.XCoord - centerJoint.XCoord;
+        double y2 = endJoint.YCoord - centerJoint.YCoord;
+
+        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.Yellow);
+      }
+    }
+
     private void DrawPoint(double x, double y, Color color) {
       Ellipse point = new Ellipse {
         Width = 7,
@@ -136,6 +156,19 @@ namespace DaveFitness.Panels {
       Canvas.SetLeft(point, x - point.Width / 2);
       Canvas.SetTop(point, y - point.Height / 2);
       sampleGestureCanvas.Children.Add(point);
+    }
+
+    private void DrawLine(double x1, double y1, double x2, double y2, Color color) {
+      Line myLine = new Line();
+      myLine.Stroke = new SolidColorBrush(color);
+      myLine.X1 = x1;
+      myLine.X2 = x2;
+      myLine.Y1 = y1;
+      myLine.Y2 = y2;
+      myLine.HorizontalAlignment = HorizontalAlignment.Left;
+      myLine.VerticalAlignment = VerticalAlignment.Top;
+      myLine.StrokeThickness = 5;
+      sampleGestureCanvas.Children.Add(myLine);
     }
 
     private void RecordInitialPosition() {
@@ -232,7 +265,7 @@ namespace DaveFitness.Panels {
     private void UpdateFeedback(object sender, ElapsedEventArgs e) {
       if (recordedGesture != null && referenceGesture != null) {
         this.Dispatcher.Invoke((Action)(() => { // update from any thread
-          DrawFeedbackSkeleton(recordedGesture[recordIndex++], referenceGesture[referenceIndex++]);
+          DrawFeedbackSkeleton(referenceGesture[referenceIndex++], recordedGesture[recordIndex++]);
         }));
       }
 
@@ -275,7 +308,22 @@ namespace DaveFitness.Panels {
         double x = joint.XCoord - centerReferenceJoint.XCoord;
         double y = joint.YCoord - centerReferenceJoint.YCoord;
 
-        DrawPoint(centerX + x * 200, centerY - y * 200, Colors.Red);
+        DrawPoint(centerX + x * 200, centerY - y * 200, Colors.Yellow);
+      }
+
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        Tuple<JointName, JointName> boneExtremities = Mapper.BoneJointMap[boneName];
+        SkeletonModel.Model.Joint startJoint = reference.JointSkeleton.GetJoint(boneExtremities.Item1);
+        SkeletonModel.Model.Joint endJoint = reference.JointSkeleton.GetJoint(boneExtremities.Item2);
+
+        if (startJoint == null || endJoint == null) continue;
+
+        double x1 = startJoint.XCoord - centerReferenceJoint.XCoord;
+        double y1 = startJoint.YCoord - centerReferenceJoint.YCoord;
+        double x2 = endJoint.XCoord - centerReferenceJoint.XCoord;
+        double y2 = endJoint.YCoord - centerReferenceJoint.YCoord;
+        
+        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Yellow);
       }
 
       foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
@@ -286,8 +334,24 @@ namespace DaveFitness.Panels {
         double x = joint.XCoord - centerRecordJoint.XCoord;
         double y = joint.YCoord - centerRecordJoint.YCoord;
 
-        DrawPoint(centerX + x * 200, centerY - y * 200, Colors.Yellow);
+        DrawPoint(centerX + x * 200, centerY - y * 200, Colors.Red);
       }
+
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        Tuple<JointName, JointName> boneExtremities = Mapper.BoneJointMap[boneName];
+        SkeletonModel.Model.Joint startJoint = record.JointSkeleton.GetJoint(boneExtremities.Item1);
+        SkeletonModel.Model.Joint endJoint = record.JointSkeleton.GetJoint(boneExtremities.Item2);
+
+        if (startJoint == null || endJoint == null) continue;
+
+        double x1 = startJoint.XCoord - centerRecordJoint.XCoord;
+        double y1 = startJoint.YCoord - centerRecordJoint.YCoord;
+        double x2 = endJoint.XCoord - centerRecordJoint.XCoord;
+        double y2 = endJoint.YCoord - centerRecordJoint.YCoord;
+
+        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Red);
+      }
+
     }
 
     private void ColorFrameHandler(object sender, KinectColorFrameEventArgs e) {
@@ -325,7 +389,7 @@ namespace DaveFitness.Panels {
           joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
         Point point = new Point(colorImagePoint.X, colorImagePoint.Y);
-        drawingContext.DrawEllipse(new SolidColorBrush(Color.FromArgb(255, 255, 255, 0)), null, point, 5, 5);
+        drawingContext.DrawEllipse(new SolidColorBrush(Colors.Red), new Pen(new SolidColorBrush(Colors.White), 3), point, 7, 7);
       }
 
       drawingContext.Close();
