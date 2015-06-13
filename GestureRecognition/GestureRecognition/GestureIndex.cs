@@ -127,11 +127,14 @@ namespace GestureRecognition {
             }
           }
 
-          Console.WriteLine(sum);
 
           if (sum > maxSum) maxSum = sum;
         }
       }
+
+      maxSum *= 1.5f;
+
+      Console.WriteLine("threshold will be " + maxSum);
 
       return maxSum;
     }

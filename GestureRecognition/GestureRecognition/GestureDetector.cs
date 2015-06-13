@@ -27,9 +27,10 @@ namespace GestureRecognition {
       }
 
       DTWComputer computer = new DTWComputer();
+      float sum = 0;
 
       for (int i = 0; i < files.Count; i++) {
-        float sum = 0;
+        sum = 0;
 
         BodyManager reference = new BodyManager();
         reference.LoadBodyData(files[i]);
@@ -42,15 +43,19 @@ namespace GestureRecognition {
           }
         }
 
-        Console.WriteLine("for sample " + i + ": " + sum);
 
         // we need a confidence threshold... getting the max difference between samples is not 
         // the best solution... for now * 2 seems to work
         if (sum < gestureData.threshold * 2) {
+          Console.WriteLine("correct gesture threshold: " + sum);
+
           closestSample = reference;
           return true;
         }
       }
+
+      Console.WriteLine("incorrect gesture threshold: " + sum);
+
 
       closestSample = new BodyManager();
       closestSample.LoadBodyData(files[0]);

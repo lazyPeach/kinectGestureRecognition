@@ -97,10 +97,10 @@ namespace DaveFitness.Panels {
           centerY = (int)sampleGestureCanvas.Height / 2; 
           DrawSampleGestureSkeleton(selectedGestureSamples[gestureSampleIndex++]);
         }));
-      }
 
-      if (gestureSampleIndex == selectedGestureSamples.Length) { // start from the beginning
-        gestureSampleIndex = 0;
+        if (gestureSampleIndex == selectedGestureSamples.Length) { // start from the beginning
+          gestureSampleIndex = 0;
+        }
       }
     }
 
@@ -142,7 +142,7 @@ namespace DaveFitness.Panels {
         double x2 = endJoint.XCoord - centerJoint.XCoord;
         double y2 = endJoint.YCoord - centerJoint.YCoord;
 
-        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.Yellow);
+        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.OrangeRed);
       }
     }
 
@@ -323,7 +323,7 @@ namespace DaveFitness.Panels {
         double x2 = endJoint.XCoord - centerReferenceJoint.XCoord;
         double y2 = endJoint.YCoord - centerReferenceJoint.YCoord;
         
-        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Yellow);
+        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.OrangeRed);
       }
 
       foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
@@ -349,7 +349,7 @@ namespace DaveFitness.Panels {
         double x2 = endJoint.XCoord - centerRecordJoint.XCoord;
         double y2 = endJoint.YCoord - centerRecordJoint.YCoord;
 
-        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Red);
+        DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Black);
       }
 
     }

@@ -92,6 +92,7 @@ namespace DaveFitness.Panels {
 
       if (e.StampleNr == 5) {
         gestureIndex.SaveNewGesture();
+        gestureRecorder.GestureRecordEventHandler -= GestureRecordEventHandler;
       }
     }
 
@@ -109,6 +110,7 @@ namespace DaveFitness.Panels {
 
       if (countdownSec == 5) {
         timer.Stop();
+        timer.Elapsed -= UpdateTimerBar;
         gestureRecorder.RecordInitialPosition(false);
         return;
       }
@@ -166,6 +168,9 @@ namespace DaveFitness.Panels {
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
       this.Dispatcher.Invoke((Action)(() => { // update from any thread
         repetitionsLbl.Content = "0";
+        for (int i = 0; i < 5; i++) {
+          timeRect[i].Visibility = System.Windows.Visibility.Visible;
+        }
       }));
       
       if (newGestureTxt.Text == "")
@@ -175,7 +180,7 @@ namespace DaveFitness.Panels {
         gestureIndex.AddGesture(newGestureTxt.Text);
         UpdateGestureList(gestureIndex.GetAllGestures());
         newGestureTxt.Text = "";
-        newGestureTxt.IsEnabled = false;
+        //newGestureTxt.IsEnabled = false;
       } catch (GestureAlreadyExistsException ex) {
         MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
       }
@@ -189,9 +194,9 @@ namespace DaveFitness.Panels {
 
     private void NewGestureTxtGotFocus(object sender, RoutedEventArgs e) {
       if (newGestureTxt.Text == "gesture name") {
-        newGestureTxt.Text = "";
-        newGestureTxt.Foreground = new SolidColorBrush(Colors.Black);
-      }
+          newGestureTxt.Text = "";
+          newGestureTxt.Foreground = new SolidColorBrush(Colors.Black);
+        }
     }
 
     private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
