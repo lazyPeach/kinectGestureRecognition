@@ -11,10 +11,10 @@ namespace GestureRecognition {
 
   public enum InitialPositionState { Enter, Exit };
 
-  public class InitialPositionComputer {
+  public class InitialPositionValidator {
     public event InitialPositionEventHandler InitialPositionEventHandler;
 
-    public InitialPositionComputer(BodyManager bodyManager) {
+    public InitialPositionValidator(BodyManager bodyManager) {
       initialPositionDeviation = new BodyDeviation();
       bodySamples = new List<Body>();
       

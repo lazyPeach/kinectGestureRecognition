@@ -18,13 +18,14 @@ namespace DaveFitness.Panels {
   public partial class TrainPanel : UserControl {
     public TrainPanel() {
       InitializeComponent();
+      AddTimeRectangles();
+      LoadDatabase();
+    }
 
+    private void LoadDatabase() {
       gestureIndex = new GestureIndex();
       gestureIndex.LoadDB();
       UpdateGestureList(gestureIndex.GetAllGestures());
-      gestureList.SelectedIndex = 0;
-
-      AddRectangles();
     }
 
     public BodyManager BodyManager { set { bodyManager = value; } }
@@ -43,7 +44,7 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void AddRectangles() {
+    private void AddTimeRectangles() {
       timeRect = new Rectangle[5];
       SolidColorBrush fillBrush = new SolidColorBrush(Colors.Red);
 
@@ -61,7 +62,7 @@ namespace DaveFitness.Panels {
       switch (command) {
         case VoiceCommand.Start:
           if (bodyManager != null) {
-            initialPositionComputer = new InitialPositionComputer(bodyManager);
+            initialPositionComputer = new InitialPositionValidator(bodyManager);
             gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
             gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
             gestureRecorder.RecordInitialPosition(true);
@@ -138,7 +139,7 @@ namespace DaveFitness.Panels {
         }
     }
 
-    private InitialPositionComputer initialPositionComputer;
+    private InitialPositionValidator initialPositionComputer;
     private GestureRecorder gestureRecorder;
     private BodyManager bodyManager;
     private Rectangle[] timeRect;

@@ -53,7 +53,7 @@
     <Compile Include="GestureDetector.cs" />
     <Compile Include="GestureIndex.cs" />
     <Compile Include="GestureRecorder.cs" />
-    <Compile Include="InitialPositionComputer.cs" />
+    <Compile Include="InitialPositionValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

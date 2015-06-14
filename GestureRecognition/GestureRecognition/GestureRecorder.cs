@@ -16,7 +16,7 @@ namespace GestureRecognition {
   public class GestureRecorder {
     public event GestureRecordEventHandler GestureRecordEventHandler;
 
-    public GestureRecorder(BodyManager bodyManager, InitialPositionComputer initialComputer, string gestureFileName) {
+    public GestureRecorder(BodyManager bodyManager, InitialPositionValidator initialComputer, string gestureFileName) {
       this.bodyManager = bodyManager;
       this.initialComputer = initialComputer;
       this.gestureFileName = gestureFileName;
@@ -69,7 +69,7 @@ namespace GestureRecognition {
 
     private int samplesCount = 0;
     private BodyManager bodyManager;
-    private InitialPositionComputer initialComputer;
+    private InitialPositionValidator initialComputer;
     private string gestureFileName;
   }
 }

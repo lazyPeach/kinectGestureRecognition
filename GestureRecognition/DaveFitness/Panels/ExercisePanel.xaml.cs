@@ -46,7 +46,7 @@ namespace DaveFitness.Panels {
       switch (command) {
         case VoiceCommand.Start:
           if (bodyManager != null) {
-            initialPositionComputer = new InitialPositionComputer(bodyManager);
+            initialPositionComputer = new InitialPositionValidator(bodyManager);
             RecordInitialPosition();
             StartRecordingTimer();
           }
@@ -382,7 +382,7 @@ namespace DaveFitness.Panels {
     private KinectManager kinectManager;
     private GestureIndex gestureIndex;
     private GestureDetector gestureDetector;
-    private InitialPositionComputer initialPositionComputer;
+    private InitialPositionValidator initialPositionComputer;
     private Body[] referenceGesture;
     private Body[] recordedGesture;
     private Body[] selectedGestureSamples;
