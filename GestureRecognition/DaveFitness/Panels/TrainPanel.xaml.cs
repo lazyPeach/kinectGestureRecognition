@@ -1,4 +1,5 @@
-﻿using GestureRecognition;
+﻿using DaveFitness.Events;
+using GestureRecognition;
 using GestureRecognition.Events;
 using GestureRecognition.Exceptions;
 using Microsoft.Kinect;
@@ -18,22 +19,40 @@ namespace DaveFitness.Panels {
   public partial class TrainPanel : UserControl {
     public TrainPanel() {
       InitializeComponent();
-      AddTimeRectangles();
       LoadDatabase();
+      UpdateGestureList(gestureIndex.GetAllGestures());
+      countdownTimer.CountdownEventHandler += CountdownEventHandler;
     }
 
-    private void LoadDatabase() {
-      gestureIndex = new GestureIndex();
-      gestureIndex.LoadDB();
-      UpdateGestureList(gestureIndex.GetAllGestures());
+    private void CountdownEventHandler(object sender, CountdownEventArgs e) {
+      Console.WriteLine("done");
+      //gestureRecorder.RecordInitialPosition(false);
     }
 
     public BodyManager BodyManager { set { bodyManager = value; } }
-    
+
     public KinectManager KinectManager {
       set {
         kinectManager = value;
         videoStream.KinectManager = value;
+      }
+    }
+
+    public void ExecuteVoiceCommand(VoiceCommand command) {
+      switch (command) {
+        case VoiceCommand.Start:
+          if (bodyManager != null) {
+            countdownTimer.ResetTimer();
+            countdownTimer.StartCountdown();
+            //initialPositionComputer = new InitialPositionValidator(bodyManager);
+            //gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
+            //gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
+            //gestureRecorder.RecordInitialPosition(true);
+            //StartRecordingTimer();
+          }
+          break;
+        case VoiceCommand.Stop:
+          break;
       }
     }
 
@@ -44,34 +63,9 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void AddTimeRectangles() {
-      timeRect = new Rectangle[5];
-      SolidColorBrush fillBrush = new SolidColorBrush(Colors.Red);
-
-      for (int i = 0; i < 5; i++) {
-        timeRect[i] = new Rectangle();
-        timeRect[i].Height = 50;
-        timeRect[i].Width = 30;
-        timeRect[i].Fill = fillBrush;
-        timerGrid.Children.Add(timeRect[i]);
-        Grid.SetColumn(timeRect[i], i);
-      }
-    }
-
-    public void ExecuteVoiceCommand(VoiceCommand command) {
-      switch (command) {
-        case VoiceCommand.Start:
-          if (bodyManager != null) {
-            initialPositionComputer = new InitialPositionValidator(bodyManager);
-            gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
-            gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
-            gestureRecorder.RecordInitialPosition(true);
-            StartRecordingTimer();
-          }
-          break;
-        case VoiceCommand.Stop:
-          break;
-      }
+    private void LoadDatabase() {
+      gestureIndex = new GestureIndex();
+      gestureIndex.LoadDB();
     }
 
     private void GestureRecordEventHandler(object sender, GestureRecordEventArgs e) {
@@ -85,32 +79,11 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void StartRecordingTimer() {
-      countdownSec = 0;
-      timer = new System.Timers.Timer { Interval = 1000 };
-      timer.Elapsed += UpdateTimerBar;
-      timer.Start();
-    }
-
-    private void UpdateTimerBar(object sender, ElapsedEventArgs e) {
-      this.Dispatcher.Invoke((Action)(() => { // update from any thread
-        timeRect[countdownSec++].Visibility = System.Windows.Visibility.Hidden;
-      }));
-
-      if (countdownSec == 5) {
-        timer.Stop();
-        timer.Elapsed -= UpdateTimerBar;
-        gestureRecorder.RecordInitialPosition(false);
-        return;
-      }
-    }
 
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
       this.Dispatcher.Invoke((Action)(() => { // update from any thread
         repetitionsLbl.Content = "0";
-        for (int i = 0; i < 5; i++) {
-          timeRect[i].Visibility = System.Windows.Visibility.Visible;
-        }
+        countdownTimer.ResetTimer();
       }));
       
       if (newGestureTxt.Text == "")
@@ -142,10 +115,7 @@ namespace DaveFitness.Panels {
     private InitialPositionValidator initialPositionComputer;
     private GestureRecorder gestureRecorder;
     private BodyManager bodyManager;
-    private Rectangle[] timeRect;
     private KinectManager kinectManager;
     private GestureIndex gestureIndex;
-    private int countdownSec;
-    private Timer timer;
   }
 }

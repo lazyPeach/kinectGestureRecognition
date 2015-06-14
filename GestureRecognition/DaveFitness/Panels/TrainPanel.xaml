@@ -36,19 +36,11 @@
         </LinearGradientBrush>
       </Button.Background>
     </Button>
-    <Label Content="Time" Foreground="White" HorizontalAlignment="Left" Margin="10,495,0,0" VerticalAlignment="Top" Height="50" Width="90" FontSize="30" FontWeight="Bold"/>
 
     <Label Content="Repetitions" Foreground="White" HorizontalAlignment="Left" Margin="330,495,0,0" VerticalAlignment="Top" Height="50" Width="170" FontSize="30" FontWeight="Bold"/>
     <Label x:Name="repetitionsLbl" Content="" Foreground="White" HorizontalAlignment="Left" Margin="505,495,0,0" VerticalAlignment="Top" Height="50" Width="50" FontSize="30" FontWeight="Bold"/>
-    <Grid x:Name="timerGrid" HorizontalAlignment="Left" Height="50" Margin="105,500,0,0" VerticalAlignment="Top" Width="150">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-      </Grid.ColumnDefinitions>
-    </Grid>
+
+    <local:CountdownTimer x:Name="countdownTimer" HorizontalAlignment="Left" Height="50" Margin="10,495,0,0" VerticalAlignment="Top" Width="300"/>
 
 
   </Grid>
