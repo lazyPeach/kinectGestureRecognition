@@ -36,8 +36,9 @@ namespace DaveFitness.Panels {
     public KinectManager KinectManager {
       set {
         kinectManager = value;
-        kinectManager.KinectColorFrameEventHandler += ColorFrameHandler;
-        kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
+        videoStream.KinectManager = value;
+        //kinectManager.KinectColorFrameEventHandler += ColorFrameHandler;
+        //kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
       }
     }
 
@@ -352,51 +353,6 @@ namespace DaveFitness.Panels {
 
         DrawLine(centerX + x1 * 200, centerY - y1 * 200, centerX + x2 * 200, centerY - y2 * 200, Colors.Black);
       }
-
-    }
-
-    private void ColorFrameHandler(object sender, KinectColorFrameEventArgs e) {
-      if (pixels == null) {
-        pixels = new byte[e.ImageFrame.PixelDataLength];
-      }
-
-      e.ImageFrame.CopyPixelDataTo(pixels);
-
-      // A WriteableBitmap is a WPF construct that enables resetting the Bits of the image.
-      // This is more efficient than creating a new Bitmap every frame.
-      if (cameraSource == null) {
-        cameraSource = new WriteableBitmap(e.ImageFrame.Width, e.ImageFrame.Height, 96, 96, PixelFormats.Bgr32, null);
-      }
-
-      int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-      cameraSource.WritePixels(new Int32Rect(0, 0, e.ImageFrame.Width, e.ImageFrame.Height),
-            pixels, e.ImageFrame.Width * Bgr32BytesPerPixel, 0);
-
-      cameraFrame.Source = cameraSource;
-    }
-
-    private void SkeletonEventHandler(object sender, KinectSkeletonEventArgs e) {
-      KinectManager manager = sender as KinectManager;
-      KinectSensor sensor = manager.Sensor;
-      DrawSkeletonOnVideo(new CoordinateMapper(sensor), e.Skeleton);
-    }
-
-    private void DrawSkeletonOnVideo(CoordinateMapper coordinateMapper, Skeleton skeleton) {
-      DrawingVisual drawingVisual = new DrawingVisual();
-      DrawingContext drawingContext = drawingVisual.RenderOpen();
-
-      foreach (Microsoft.Kinect.Joint joint in skeleton.Joints) {
-        ColorImagePoint colorImagePoint = coordinateMapper.MapSkeletonPointToColorPoint(
-          joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
-
-        Point point = new Point(colorImagePoint.X, colorImagePoint.Y);
-        drawingContext.DrawEllipse(new SolidColorBrush(Colors.Red), new Pen(new SolidColorBrush(Colors.White), 3), point, 7, 7);
-      }
-
-      drawingContext.Close();
-      RenderTargetBitmap renderBmp = new RenderTargetBitmap(640, 480, 96d, 96d, PixelFormats.Pbgra32);
-      renderBmp.Render(drawingVisual);
-      skeletonFrame.Source = renderBmp;
     }
 
     // display a sample of the gesture that should be performed by the user

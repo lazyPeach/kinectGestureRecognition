@@ -40,8 +40,7 @@ namespace DaveFitness.Panels {
           joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
         Point point = new Point(colorImagePoint.X, colorImagePoint.Y);
-        drawingContext.DrawEllipse(new SolidColorBrush(Color.FromArgb(255, 255, 255, 0)),
-          null, point, 5, 5);
+        drawingContext.DrawEllipse(new SolidColorBrush(Colors.Red), new Pen(new SolidColorBrush(Colors.White), 3), point, 7, 7);
       }
 
       drawingContext.Close();

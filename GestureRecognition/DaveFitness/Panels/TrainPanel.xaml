@@ -17,8 +17,6 @@
 
     <local:VideoStream x:Name="videoStream" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
 
-    <!--<Image x:Name="cameraFrame" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
-    <Image x:Name="skeletonFrame" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>-->
     <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Margin="655,10,0,0" VerticalAlignment="Top" Height="250" Width="635" FontWeight="Bold" FontSize="30"><Run Text="In order to add a new gesture, you have to insert the new gesture name in the text box below, click add, move in the initial position and say 'Start'. After you say start wait for 5 seconds. At the end of the 5 seconds start performing the gesture for 5 times."/></TextBlock>
     <TextBox x:Name="newGestureTxt" HorizontalAlignment="Left" Height="50" Margin="655,265,0,0" TextWrapping="Wrap" Foreground="#99000000" Text="gesture name" VerticalAlignment="Top" Width="530" FontSize="30" GotFocus="NewGestureTxtGotFocus" />
     <Button x:Name="addGestureBtn" Content="Add" HorizontalAlignment="Left" Foreground="White" Margin="1189,265,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="addGestureBtn_Click" FontSize="25" FontWeight="Bold">
