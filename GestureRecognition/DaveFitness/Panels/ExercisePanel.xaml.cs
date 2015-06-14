@@ -92,11 +92,11 @@ namespace DaveFitness.Panels {
 
     private void UpdateGesturePlayer(object sender, ElapsedEventArgs e) {
       if (selectedGestureSamples != null) {
-        this.Dispatcher.Invoke((Action)(() => { // update from any thread
-          centerX = (int)sampleGestureCanvas.Width / 2;
-          centerY = (int)sampleGestureCanvas.Height / 2; 
-          DrawSampleGestureSkeleton(selectedGestureSamples[gestureSampleIndex++]);
-        }));
+        //this.Dispatcher.Invoke((Action)(() => { // update from any thread
+        //  //centerX = (int)sampleGestureCanvas.Width / 2;
+        //  //centerY = (int)sampleGestureCanvas.Height / 2; 
+        //  //DrawSampleGestureSkeleton(selectedGestureSamples[gestureSampleIndex++]);
+        //}));
 
         if (gestureSampleIndex == selectedGestureSamples.Length) { // start from the beginning
           gestureSampleIndex = 0;

@@ -46,6 +46,12 @@ namespace GestureRecognition {
       if (!gestureDB.ContainsKey(gestureName))
         return;
 
+      foreach (string s in Directory.EnumerateFiles(@"..\..\..\..\database\")) {
+        if (s.Contains(gestureName.Replace(" ", "_"))) {
+          File.Delete(s);
+        }
+      }
+
       gestureDB.Remove(gestureName);
       SaveDB();
     }
