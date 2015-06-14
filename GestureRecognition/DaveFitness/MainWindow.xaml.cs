@@ -7,9 +7,8 @@ using System.Windows;
 
 namespace DaveFitness {
   enum FocusedPanel { Main, Test, Train, Exercise }
-  public enum VoiceCommand { Exercise, Train, Test, Back, Start, Up, Down, Select }
 
-  public partial class MainWindow : Window {
+    public partial class MainWindow : Window {
     public MainWindow() {
       InitializeComponent();
       this.Closed += ClosedWindow;
@@ -36,50 +35,44 @@ namespace DaveFitness {
       kinectManager.Stop();
     }
 
-    // refactor: change pannels from here... don't expect events from main panel
     private void RecognizedCommand(object sender, RecognizedCommandEventArgs e) {
       switch (e.RecognizedCommand) {
-        case "exercise":
-          Console.WriteLine("exercise");
+        case VoiceCommand.Exercise:
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Exercise);
           }
           break;
-        case "train":
-          Console.WriteLine("train");
+        case VoiceCommand.Train:
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Train);
           }
           break;
-        case "test":
-          Console.WriteLine("test");
+        case VoiceCommand.Test:
           if (focusedPanel == FocusedPanel.Main) {
             ChangeFocus(FocusedPanel.Test);
           }
           break;
-        case "back":
-          Console.WriteLine("back");
+        case VoiceCommand.Back: // todo: create a panel manager. right now we know that for back we only get to main panel but in the future it may get complicated
           focusedPanel = FocusedPanel.Main;
           exercisePanel.Visibility = System.Windows.Visibility.Hidden;
           trainPanel.Visibility = System.Windows.Visibility.Hidden;
           testPanel.Visibility = System.Windows.Visibility.Hidden;
           break;
-        case "start":
-          Console.WriteLine("start");
-          RedirectVoiceCommand(VoiceCommand.Start);
+        default:
+          RedirectVoiceCommand(e.RecognizedCommand);
           break;
-        case "up":
-          Console.WriteLine("up");
-          RedirectVoiceCommand(VoiceCommand.Up);
-          break;
-        case "down":
-          Console.WriteLine("down");
-          RedirectVoiceCommand(VoiceCommand.Down);
-          break;
-        case "select":
-          Console.WriteLine("select5");
-          RedirectVoiceCommand(VoiceCommand.Select);
-          break;
+        //case VoiceCommand.Start:
+        //  RedirectVoiceCommand(VoiceCommand.Start);
+        //  break;
+        //case VoiceCommand.Stop:
+        //  RedirectVoiceCommand(VoiceCommand.Stop);
+        //  break;
+        //case VoiceCommand.Up:
+        //  RedirectVoiceCommand(VoiceCommand.Up);
+        //  break;
+        //case VoiceCommand.Down:
+        //  RedirectVoiceCommand(VoiceCommand.Down);
+        //  break;
       }
     }
 

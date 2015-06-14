@@ -5,6 +5,7 @@ using SkeletonModel.Events;
 using SkeletonModel.Managers;
 using SkeletonModel.Model;
 using SkeletonModel.Util;
+using SpeechRecognition;
 using System;
 using System.Collections.Generic;
 using System.Timers;

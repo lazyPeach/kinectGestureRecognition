@@ -11,37 +11,37 @@ namespace SpeechRecognition {
 
     public SpeechRecognitionManager(KinectSensor kinectSensor) {
       sensor = kinectSensor;
-
       RecognizerInfo recognizerInfo = GetKinectRecognizer();
-
 
       if (null != recognizerInfo) {
         this.speechEngine = new SpeechRecognitionEngine(recognizerInfo.Id);
+        speechEngine.LoadGrammar(CreateGrammar(recognizerInfo));
 
-        Choices options = new Choices();
-        options.Add(new string[] { "exercise", "train", "test", "back", "start", "up", "down", "select" });
-
-        
-        GrammarBuilder grammarBuilder = new GrammarBuilder { Culture = recognizerInfo.Culture };
-        grammarBuilder.Append(options);
-
-        Grammar grammar = new Grammar(grammarBuilder);
-        speechEngine.LoadGrammar(grammar);
-
-        speechEngine.SpeechRecognized += SpeechRecognized;
-        speechEngine.SpeechRecognitionRejected += SpeechRejected;
-
-        speechEngine.SetInputToAudioStream(
-            sensor.AudioSource.Start(), new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
-        speechEngine.RecognizeAsync(RecognizeMode.Multiple);
+        SetupSpeechEngine();
       } else {
+        Console.WriteLine("Recognizer info is null");
       }
     }
 
-    protected virtual void OnEvent(RecognizedCommandEventArgs e) {
-      if (RecognizedCommandEventHandler != null) {
-        RecognizedCommandEventHandler(this, e);
-      }
+    private void SetupSpeechEngine() {
+      speechEngine.SpeechRecognized += SpeechRecognized;
+      speechEngine.SpeechRecognitionRejected += SpeechRejected;
+
+      speechEngine.SetInputToAudioStream(
+          sensor.AudioSource.Start(), new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
+      speechEngine.RecognizeAsync(RecognizeMode.Multiple);
+    }
+
+    private Grammar CreateGrammar(RecognizerInfo recognizerInfo) {
+      Choices options = new Choices();
+      options.Add(new string[] { "exercise", "train", "test", "back", "start", "stop", "up", "down" });
+
+
+      GrammarBuilder grammarBuilder = new GrammarBuilder { Culture = recognizerInfo.Culture };
+      grammarBuilder.Append(options);
+
+      Grammar grammar = new Grammar(grammarBuilder);
+      return grammar;
     }
 
     private RecognizerInfo GetKinectRecognizer() {
@@ -56,7 +56,6 @@ namespace SpeechRecognition {
       return null;
     }
 
-
     private void SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
       const double confidenceThreshold = 0.5;
 
@@ -65,8 +64,14 @@ namespace SpeechRecognition {
       }
     }
 
+    protected virtual void OnEvent(RecognizedCommandEventArgs e) {
+      if (RecognizedCommandEventHandler != null) {
+        RecognizedCommandEventHandler(this, e);
+      }
+    }
+
     private void SpeechRejected(object sender, SpeechRecognitionRejectedEventArgs e) {
-      Console.WriteLine("Rejected");
+      Console.WriteLine("Dictionary does not contain this word");
     }
 
     private KinectSensor sensor;

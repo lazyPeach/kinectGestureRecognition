@@ -86,6 +86,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Panels\VideoStream.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Panels\ExercisePanel.xaml.cs">
@@ -99,6 +103,9 @@
     </Compile>
     <Compile Include="Panels\TrainPanel.xaml.cs">
       <DependentUpon>TrainPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\VideoStream.xaml.cs">
+      <DependentUpon>VideoStream.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
