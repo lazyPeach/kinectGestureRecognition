@@ -25,11 +25,15 @@ namespace DaveFitness.Panels {
     }
 
     private void CountdownEventHandler(object sender, CountdownEventArgs e) {
-      Console.WriteLine("done");
-      //gestureRecorder.RecordInitialPosition(false);
+      gestureManager.StopRecordingInitialPosition();
     }
 
-    public BodyManager BodyManager { set { bodyManager = value; } }
+    public BodyManager BodyManager { 
+      set { 
+        bodyManager = value;
+        gestureManager = new GestureManager(value);
+      } 
+    }
 
     public KinectManager KinectManager {
       set {
@@ -44,6 +48,7 @@ namespace DaveFitness.Panels {
           if (bodyManager != null) {
             countdownTimer.ResetTimer();
             countdownTimer.StartCountdown();
+            gestureManager.StartRecordingInitialPosition();
             //initialPositionComputer = new InitialPositionValidator(bodyManager);
             //gestureRecorder = new GestureRecorder(bodyManager, initialPositionComputer, gestureIndex.GestureDB[gestureIndex.NewGesture].fileName);
             //gestureRecorder.GestureRecordEventHandler += GestureRecordEventHandler;
@@ -68,16 +73,16 @@ namespace DaveFitness.Panels {
       gestureIndex.LoadDB();
     }
 
-    private void GestureRecordEventHandler(object sender, GestureRecordEventArgs e) {
-      this.Dispatcher.Invoke((Action)(() => { // update from any thread
-        repetitionsLbl.Content = e.StampleNr.ToString();
-      }));
+    //private void GestureRecordEventHandler(object sender, GestureRecordEventArgs e) {
+    //  this.Dispatcher.Invoke((Action)(() => { // update from any thread
+    //    repetitionsLbl.Content = e.StampleNr.ToString();
+    //  }));
 
-      if (e.StampleNr == 5) {
-        gestureIndex.SaveNewGesture();
-        gestureRecorder.GestureRecordEventHandler -= GestureRecordEventHandler;
-      }
-    }
+    //  if (e.StampleNr == 5) {
+    //    gestureIndex.SaveNewGesture();
+    //    //gestureRecorder.GestureRecordEventHandler -= GestureRecordEventHandler;
+    //  }
+    //}
 
 
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
@@ -112,10 +117,9 @@ namespace DaveFitness.Panels {
         }
     }
 
-    private InitialPositionValidator initialPositionComputer;
-    private GestureRecorder gestureRecorder;
     private BodyManager bodyManager;
     private KinectManager kinectManager;
     private GestureIndex gestureIndex;
+    private GestureManager gestureManager;
   }
 }

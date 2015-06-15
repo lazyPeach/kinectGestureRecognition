@@ -7,22 +7,16 @@ using System;
 using System.Collections.Generic;
 
 namespace GestureRecognition {
-  public delegate void InitialPositionEventHandler(object sender, InitialPositionEventArgs e);
+  //public delegate void InitialPositionEventHandler(object sender, InitialPositionEventArgs e);
 
   public enum InitialPositionState { Enter, Exit };
 
   public class InitialPositionValidator {
-    public event InitialPositionEventHandler InitialPositionEventHandler;
-
-    public InitialPositionValidator(BodyManager bodyManager) {
-      initialPositionDeviation = new BodyDeviation();
-      bodySamples = new List<Body>();
-      
-      this.bodyManager = bodyManager;
-      bodyManager.BodyEventHandler += BodyEventHandler;
+    public InitialPositionValidator(Body[] bodySamples) {
+      ComputeInitialPosition(bodySamples);
     }
 
-    public void ComputeInitialPosition() {
+    public void ComputeInitialPosition(Body[] bodySamples) {
       foreach (Body body in bodySamples) {
         foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
           ComputeMinBounds(body, boneName);
@@ -33,42 +27,67 @@ namespace GestureRecognition {
       foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
         OffsetBounds(boneName);
       }
-
-      isInitialPositionComputed = true;
     }
+    
+    //public event InitialPositionEventHandler InitialPositionEventHandler;
 
-    public bool Record { set { shouldRecord = value; } }
+
+
+    //public InitialPositionValidator(BodyManager bodyManager) {
+    //  initialPositionDeviation = new BodyDeviation();
+    //  bodySamples = new List<Body>();
+      
+    //  this.bodyManager = bodyManager;
+    //  bodyManager.BodyEventHandler += BodyEventHandler;
+    //}
+
+    //public void ComputeInitialPosition() {
+    //  foreach (Body body in bodySamples) {
+    //    foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+    //      ComputeMinBounds(body, boneName);
+    //      ComputeMaxBounds(body, boneName);
+    //    }
+    //  }
+
+    //  foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+    //    OffsetBounds(boneName);
+    //  }
+
+    //  isInitialPositionComputed = true;
+    //}
+
+    //public bool Record { set { shouldRecord = value; } }
 
     // InitialPosition event should be fired only when body enters in initial position or exits the
     // initial position. To achieve this, a flag will be used to store the last known state of the 
     // body. If the last known state is
-    private void BodyEventHandler(object sender, BodyEventArgs e) {
-      if (shouldRecord) {
-        bodySamples.Add(e.Body);
-        return;
-      }
+    //private void BodyEventHandler(object sender, BodyEventArgs e) {
+    //  if (shouldRecord) {
+    //    bodySamples.Add(e.Body);
+    //    return;
+    //  }
 
-      if (IsInitialPosition(e.Body) && !IsInitialPosition(previousSample)) {
-        FireEvent(new InitialPositionEventArgs(InitialPositionState.Enter));
-      }
+    //  if (IsInitialPosition(e.Body) && !IsInitialPosition(previousSample)) {
+    //    FireEvent(new InitialPositionEventArgs(InitialPositionState.Enter));
+    //  }
       
-      if (!IsInitialPosition(e.Body) && IsInitialPosition(previousSample)){
-        FireEvent(new InitialPositionEventArgs(InitialPositionState.Exit));
-      }
+    //  if (!IsInitialPosition(e.Body) && IsInitialPosition(previousSample)){
+    //    FireEvent(new InitialPositionEventArgs(InitialPositionState.Exit));
+    //  }
 
-      previousSample = e.Body;
-    }
+    //  previousSample = e.Body;
+    //}
 
-    protected virtual void FireEvent(InitialPositionEventArgs e) {
-      if (InitialPositionEventHandler != null) {
-        InitialPositionEventHandler(this, e);
-      }
-    }
+    //protected virtual void FireEvent(InitialPositionEventArgs e) {
+    //  if (InitialPositionEventHandler != null) {
+    //    InitialPositionEventHandler(this, e);
+    //  }
+    //}
 
     private bool IsInitialPosition(Body body) {
-      if (!isInitialPositionComputed) {
-        return false;
-      }
+      //if (!isInitialPositionComputed) {
+      //  return false;
+      //}
 
       foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
         bool godCondition =
@@ -91,11 +110,6 @@ namespace GestureRecognition {
       float offset;
       if (boneName == BoneName.BodyCenter || boneName == BoneName.Neck) {
         offset = 0.5f;
-      } else if (boneName == BoneName.ArmLeft || boneName == BoneName.ArmRight ||
-                 boneName == BoneName.ForearmLeft || boneName == BoneName.ForearmRight ||
-                 boneName == BoneName.FemurusLeft || boneName == BoneName.FemurusRight ||
-                 boneName == BoneName.TibiaLeft || boneName == BoneName.TibiaRight) {
-        offset = 0.1f;
       } else {
         offset = 0.1f;
       }
@@ -155,11 +169,11 @@ namespace GestureRecognition {
     }
 
 
-    private bool shouldRecord = false;
-    private bool isInitialPositionComputed = false;
-    private Body previousSample = new Body();
-    private BodyManager bodyManager;
+    //private bool shouldRecord = false;
+    //private bool isInitialPositionComputed = false;
+    //private Body previousSample = new Body();
+    //private BodyManager bodyManager;
     private BodyDeviation initialPositionDeviation;
-    private List<Body> bodySamples;
+    //private List<Body> bodySamples;
   }
 }

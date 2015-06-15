@@ -125,7 +125,7 @@ namespace GestureRecognition {
 
           BodyManager record = new BodyManager();
           record.LoadBodyData(files[j]);
-          computer.ComputeDTW(reference.RecordedDataAsArray, record.RecordedDataAsArray);
+          //computer.ComputeDTW(reference.RecordedDataAsArray, record.RecordedDataAsArray);
 
           foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
             for (int k = 0; k < 4; k++) {

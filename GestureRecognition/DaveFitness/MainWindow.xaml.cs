@@ -25,8 +25,8 @@ namespace DaveFitness {
       trainPanel.KinectManager = kinectManager;
       trainPanel.BodyManager = bodyManager;
 
-      exercisePanel.KinectManager = kinectManager;
-      exercisePanel.BodyManager = bodyManager;
+      //exercisePanel.KinectManager = kinectManager;
+      //exercisePanel.BodyManager = bodyManager;
 
       focusedPanel = FocusedPanel.Main;
     }

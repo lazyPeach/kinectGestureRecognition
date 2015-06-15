@@ -20,17 +20,17 @@ namespace DaveFitness.Panels {
     public ExercisePanel() {
       InitializeComponent();
 
-      gestureIndex = new GestureIndex();
-      gestureIndex.LoadDB();
-      gestureDetector = new GestureDetector(gestureIndex);
+      //gestureIndex = new GestureIndex();
+      //gestureIndex.LoadDB();
+      //gestureDetector = new GestureDetector(gestureIndex);
 
-      UpdateGestureList(gestureIndex.GetAllGestures());
+      //UpdateGestureList(gestureIndex.GetAllGestures());
 
-      AddTimeRectangles();
+      //AddTimeRectangles();
 
-      PlaySelectedGesture();
+      //PlaySelectedGesture();
     }
-
+    /*
     public BodyManager BodyManager { set { bodyManager = value; } }
 
     public KinectManager KinectManager {
@@ -41,15 +41,15 @@ namespace DaveFitness.Panels {
         //kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
       }
     }
-
+    */
     public void ExecuteVoiceCommand(VoiceCommand command) {
       switch (command) {
         case VoiceCommand.Start:
-          if (bodyManager != null) {
-            initialPositionComputer = new InitialPositionValidator(bodyManager);
-            RecordInitialPosition();
-            StartRecordingTimer();
-          }
+          //if (bodyManager != null) {
+          //  initialPositionComputer = new InitialPositionValidator(bodyManager);
+          //  RecordInitialPosition();
+          //  StartRecordingTimer();
+          //}
           break;
         case VoiceCommand.Up:
           if (gestureList.SelectedIndex > 0)
@@ -62,7 +62,7 @@ namespace DaveFitness.Panels {
       }
     }
 
-
+    /*
     private void UpdateGestureList(List<string> gestures) {
       gestureList.Items.Clear();
       foreach (string gesture in gestures) {
@@ -356,10 +356,7 @@ namespace DaveFitness.Panels {
     }
 
     // display a sample of the gesture that should be performed by the user
-    private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-      gestureSampleIndex = 0;
-      selectedGestureSamples = GetSelectedGestureSample();
-    }
+
 
     private Body[] GetSelectedGestureSample() {
       try {
@@ -375,8 +372,12 @@ namespace DaveFitness.Panels {
         Console.WriteLine(ex.Message);
         return null;
       }
-    }
+    }*/
 
+    private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+      gestureSampleIndex = 0;
+      //selectedGestureSamples = GetSelectedGestureSample();
+    }
 
     private BodyManager bodyManager;
     private KinectManager kinectManager;
