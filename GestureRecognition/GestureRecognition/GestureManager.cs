@@ -1,7 +1,9 @@
-﻿using GestureRecognition.Events;
+﻿using GestureRecognition.DynamicTimeWarp;
+using GestureRecognition.Events;
 using SkeletonModel.Events;
 using SkeletonModel.Managers;
 using SkeletonModel.Model;
+using SkeletonModel.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +24,8 @@ namespace GestureRecognition {
     public event GestureRecordEventHandler GestureRecordEventHandler;
 
     public void AddGesture(string gestureName) {
-      gestureIndex.AddGesture(gestureName);
       gestureSamples = new List<Body[]>();
+      newGestureName = gestureName;
     }
 
     public void RemoveGesture(string gestureName) {
@@ -42,6 +44,7 @@ namespace GestureRecognition {
     public void StopRecordingInitialPosition() {
       bodyRecorder.StopRecording();
       initialPositionValidator = new InitialPositionValidator(bodyRecorder.BodySamples);
+      
     }
 
     // when gesture recording is started gesture manager checks the initial position
@@ -52,7 +55,45 @@ namespace GestureRecognition {
 
     public void StopRecordGesture() {
       this.bodyManager.BodyEventHandler -= BodyEventHandler;
+      SaveSamples();
+      gestureIndex.AddGesture(newGestureName, ComputeThreshold());
+      gestureIndex.SaveDB();
     }
+
+    private void SaveSamples() {
+      int index = 0;
+      foreach (Body[] bodySequence in gestureSamples) {
+        string filePath = @"..\..\..\..\database\" + newGestureName.Replace(" ", "_") + index + ".xml";
+        bodyManager.SaveBodyData(filePath, bodySequence);
+        index++;
+      }
+    }
+
+    private float ComputeThreshold() {
+      float maxSum = 0;
+      DTWComputer computer = new DTWComputer();
+
+      foreach (Body[] reference in gestureSamples) {
+        foreach (Body[] sample in gestureSamples) {
+          float sum = 0;
+          computer.ComputeDTW(reference, sample);
+
+          foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+            for (int k = 0; k < 4; k++) {
+              sum += computer.Result.Data[Mapper.BoneIndexMap[boneName]].BestCost[k];
+            }
+          }
+
+          if (sum > maxSum) maxSum = sum;
+        }
+      }
+
+      //maxSum *= 1.5f; // offset maxSum a little bit :)
+
+      return maxSum;
+    }
+
+
 
     private void AddNewGestureSequence(Body[] bodySequence) {
       if (bodySequence.Length < minRecordPostures) { // discard any data smaller than 50 samples
@@ -62,7 +103,7 @@ namespace GestureRecognition {
       FireEvent(new GestureRecordEventArgs(++sampleNr));
       gestureSamples.Add(bodySequence);
 
-      if (sampleNr > 5) {
+      if (sampleNr == 5) {
         StopRecordGesture();
       }
     }
@@ -96,5 +137,6 @@ namespace GestureRecognition {
     private List<Body[]> gestureSamples;
     private int sampleNr = 0;
     private int minRecordPostures = 50;
+    private string newGestureName;
   }
 }

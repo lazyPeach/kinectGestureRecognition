@@ -9,14 +9,14 @@ using System.IO;
 using System.Xml.Serialization;
 
 namespace GestureRecognition {
-  // filename is actually a part of the filename to which a number is appended
+  // todo get rid of gestureName... you already have it in key
   public struct GestureData {
-    public string name;
+    public string gestureName;
     public string fileName;
     public float threshold;
 
-    public GestureData(string name, string fileName, float threshold = 0) {
-      this.name = name;
+    public GestureData(string gestureName, string fileName, float threshold = 0) {
+      this.gestureName = gestureName;
       this.fileName = fileName;
       this.threshold = threshold;
     }
@@ -27,9 +27,9 @@ namespace GestureRecognition {
       gestureDB = new Dictionary<string, GestureData>();
     }
 
-    public void AddGesture(string gestureName) {
-      newGesture = gestureName;
-      GestureData gesture = new GestureData(gestureName, gestureName.Replace(" ", "_"));
+    public void AddGesture(string gestureName, float threshold) {
+      GestureData gesture = new GestureData(gestureName, gestureName.Replace(" ", "_"), threshold);
+
       try {
         gestureDB.Add(gestureName, gesture);
       } catch (Exception ex) {
@@ -61,7 +61,7 @@ namespace GestureRecognition {
       }
 
       foreach (GestureData gestureData in db) {
-        gestureDB.Add(gestureData.name, gestureData);
+        gestureDB.Add(gestureData.gestureName, gestureData);
       }
     }
 
@@ -90,62 +90,9 @@ namespace GestureRecognition {
       return gestures;
     }
 
-    //public void SaveNewGesture() {
-    //  GestureData gesture = new GestureData(newGesture, newGesture.Replace(" ", "_"), ComputeDTWThreshold());
-    //  gestureDB.Remove(newGesture);
-    //  gestureDB.Add(newGesture, gesture);
-
-    //  SaveDB();
-    //}
-
-    //// to refactor
-    //private float ComputeDTWThreshold() {
-    //  float maxSum = 0;
-    //  List<string> files = new List<string>();
-
-    //  foreach (string s in Directory.EnumerateFiles(@"..\..\..\..\database\")) {
-    //    if (s.Contains(gestureDB[newGesture].fileName)) {
-    //      files.Add(s);
-    //    }
-    //  }
-
-    //  DTWComputer computer = new DTWComputer();
-
-    //  for (int i = 0; i < files.Count; i++) {
-    //    BodyManager reference = new BodyManager();
-    //    reference.LoadBodyData(files[i]);
-        
-    //    for (int j = 0; j < files.Count; j++) {
-    //      float sum = 0;
-    //      FileStream recordFileStream = new FileStream(files[j], FileMode.Open, FileAccess.Read);
-
-    //      BodyManager record = new BodyManager();
-    //      record.LoadBodyData(files[j]);
-    //      //computer.ComputeDTW(reference.RecordedDataAsArray, record.RecordedDataAsArray);
-
-    //      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
-    //        for (int k = 0; k < 4; k++) {
-    //          sum += computer.Result.Data[Mapper.BoneIndexMap[boneName]].BestCost[k];
-    //        }
-    //      }
-
-
-    //      if (sum > maxSum) maxSum = sum;
-    //    }
-    //  }
-
-    //  maxSum *= 1.5f;
-
-    //  Console.WriteLine("threshold will be " + maxSum);
-
-    //  return maxSum;
-    //}
-
-    public string NewGesture { get { return newGesture; } }
-
     public Dictionary<string, GestureData> GestureDB { get { return gestureDB; } set { gestureDB = value; } }
-    
+
+
     private Dictionary<string, GestureData> gestureDB;
-    private string newGesture;
   }
 }
