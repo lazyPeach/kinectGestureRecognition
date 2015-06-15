@@ -17,22 +17,12 @@
 
     <local:VideoStream x:Name="videoStream" HorizontalAlignment="Left" Height="480" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
 
-    <ListBox x:Name="gestureList" HorizontalAlignment="Left" Height="580" Margin="990,10,0,0" VerticalAlignment="Top" Width="300" SelectionChanged="gestureList_SelectionChanged"/>
-
-    <Label Content="Time" Foreground="White" HorizontalAlignment="Left" Margin="10,495,0,0" VerticalAlignment="Top" Height="50" Width="90" FontSize="30" FontWeight="Bold"/>
+    <ListBox x:Name="gestureList" HorizontalAlignment="Left" Height="580" Margin="990,10,0,0" VerticalAlignment="Top" Width="300" SelectionChanged="gestureList_SelectionChanged" FontSize="20"/>
 
     <Label Content="Repetitions" Foreground="White" HorizontalAlignment="Left" Margin="330,495,0,0" VerticalAlignment="Top" Height="50" Width="170" FontSize="30" FontWeight="Bold"/>
     <Label x:Name="repetitionsLbl" Content="" Foreground="White" HorizontalAlignment="Left" Margin="505,495,0,0" VerticalAlignment="Top" Height="50" Width="50" FontSize="30" FontWeight="Bold"/>
-    <Grid x:Name="timerGrid" HorizontalAlignment="Left" Height="50" Margin="105,500,0,0" VerticalAlignment="Top" Width="150">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-        <ColumnDefinition Width="30"/>
-      </Grid.ColumnDefinitions>
-    </Grid>
     <Canvas x:Name="sampleGestureCanvas" Background="White" HorizontalAlignment="Right" Height="480" Margin="0,10,315,0" VerticalAlignment="Top" Width="330"/>
     <Canvas x:Name="feedbackCanvas" Background="White" HorizontalAlignment="Left" Height="580" Margin="10,10,0,0" VerticalAlignment="Top" Width="975" Visibility="Hidden"/>
+    <local:CountdownTimer HorizontalAlignment="Left" Height="50" Margin="10,495,0,0" VerticalAlignment="Top" Width="300"/>
   </Grid>
 </UserControl>

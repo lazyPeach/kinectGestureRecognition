@@ -19,29 +19,27 @@ namespace DaveFitness.Panels {
   public partial class ExercisePanel : UserControl {
     public ExercisePanel() {
       InitializeComponent();
+      InitializeGestureList();
 
-      //gestureIndex = new GestureIndex();
-      //gestureIndex.LoadDB();
       //gestureDetector = new GestureDetector(gestureIndex);
-
-      //UpdateGestureList(gestureIndex.GetAllGestures());
-
-      //AddTimeRectangles();
 
       //PlaySelectedGesture();
     }
-    /*
-    public BodyManager BodyManager { set { bodyManager = value; } }
+
+    public BodyManager BodyManager {
+      set {
+        bodyManager = value;
+        gestureManager = new GestureManager(value);
+      }
+    }
 
     public KinectManager KinectManager {
       set {
         kinectManager = value;
         videoStream.KinectManager = value;
-        //kinectManager.KinectColorFrameEventHandler += ColorFrameHandler;
-        //kinectManager.KinectSkeletonEventHandler += SkeletonEventHandler;
       }
     }
-    */
+
     public void ExecuteVoiceCommand(VoiceCommand command) {
       switch (command) {
         case VoiceCommand.Start:
@@ -63,29 +61,6 @@ namespace DaveFitness.Panels {
     }
 
     /*
-    private void UpdateGestureList(List<string> gestures) {
-      gestureList.Items.Clear();
-      foreach (string gesture in gestures) {
-        gestureList.Items.Add(gesture);
-      }
-
-      gestureList.SelectedIndex = 0;
-    }
-
-    private void AddTimeRectangles() {
-      timeRect = new Rectangle[5];
-      SolidColorBrush fillBrush = new SolidColorBrush(Colors.Red);
-
-      for (int i = 0; i < 5; i++) {
-        timeRect[i] = new Rectangle();
-        timeRect[i].Height = 50;
-        timeRect[i].Width = 30;
-        timeRect[i].Fill = fillBrush;
-        timerGrid.Children.Add(timeRect[i]);
-        Grid.SetColumn(timeRect[i], i);
-      }
-    }
-
     private void PlaySelectedGesture() {
       gestureTimer = new System.Timers.Timer { Interval = 40 };
       gestureTimer.Elapsed += UpdateGesturePlayer;
@@ -184,25 +159,6 @@ namespace DaveFitness.Panels {
       initialPositionComputer.InitialPositionEventHandler += InitialPositionEventHandler;
     }
 
-    private void StartRecordingTimer() {
-      countdownSec = 0;
-      initialPositionTimer = new System.Timers.Timer { Interval = 1000 };
-      initialPositionTimer.Elapsed += UpdateTimerBar;
-      initialPositionTimer.Start();
-    }
-
-    private void UpdateTimerBar(object sender, ElapsedEventArgs e) {
-      this.Dispatcher.Invoke((Action)(() => { // update from any thread
-        timeRect[countdownSec++].Visibility = System.Windows.Visibility.Hidden;
-      }));
-
-      if (countdownSec == 5) {
-        initialPositionTimer.Elapsed -= UpdateTimerBar;
-        initialPositionTimer.Stop();
-        StopRecordingInitialPosition();
-        return;
-      }
-    }
 
     // move this in gesture detector?
     private void InitialPositionEventHandler(object sender, InitialPositionEventArgs e) {
@@ -374,6 +330,20 @@ namespace DaveFitness.Panels {
       }
     }*/
 
+    private void InitializeGestureList() {
+      GestureIndex tempGestureIndex = new GestureIndex(); // figure out how to get rid of this too
+      tempGestureIndex.LoadDB();
+      UpdateGestureList(tempGestureIndex.GetAllGestures());
+    }
+
+    private void UpdateGestureList(List<string> gestures) {
+      gestureList.Items.Clear();
+      foreach (string gesture in gestures) {
+        gestureList.Items.Add(gesture);
+      }
+    }
+
+
     private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
       gestureSampleIndex = 0;
       //selectedGestureSamples = GetSelectedGestureSample();
@@ -381,6 +351,10 @@ namespace DaveFitness.Panels {
 
     private BodyManager bodyManager;
     private KinectManager kinectManager;
+    private GestureManager gestureManager;
+
+
+
     private GestureIndex gestureIndex;
     private GestureDetector gestureDetector;
     private InitialPositionValidator initialPositionComputer;
@@ -388,18 +362,13 @@ namespace DaveFitness.Panels {
     private Body[] recordedGesture;
     private Body[] selectedGestureSamples;
 
-    private Rectangle[] timeRect;
     private Timer gestureTimer;
-    private Timer initialPositionTimer;
     private Timer feedbackTimer;
-    private WriteableBitmap cameraSource;
 
     private int centerX;
     private int centerY;
     private int gestureSampleIndex;
-    private int countdownSec;
     private int recordIndex;
     private int referenceIndex;
-    private byte[] pixels;
   }
 }
