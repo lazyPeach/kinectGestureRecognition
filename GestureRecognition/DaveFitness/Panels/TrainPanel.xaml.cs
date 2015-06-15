@@ -19,8 +19,7 @@ namespace DaveFitness.Panels {
   public partial class TrainPanel : UserControl {
     public TrainPanel() {
       InitializeComponent();
-      LoadDatabase();
-      UpdateGestureList(gestureIndex.GetAllGestures());
+      InitializeGestureList();
       countdownTimer.CountdownEventHandler += CountdownEventHandler;
     }
 
@@ -64,18 +63,6 @@ namespace DaveFitness.Panels {
       }
     }
 
-    private void UpdateGestureList(List<string> gestures) {
-      gestureList.Items.Clear();
-      foreach (string gesture in gestures) {
-        gestureList.Items.Add(gesture);
-      }
-    }
-
-    private void LoadDatabase() {
-      gestureIndex = new GestureIndex();
-      gestureIndex.LoadDB();
-    }
-
     private void addGestureBtn_Click(object sender, RoutedEventArgs e) {
       this.Dispatcher.Invoke((Action)(() => { // update from any thread
         repetitionsLbl.Content = "0";
@@ -86,19 +73,17 @@ namespace DaveFitness.Panels {
         MessageBox.Show("You have to type a gesture name");
 
       try {
-        gestureIndex.AddGesture(newGestureTxt.Text);
-        UpdateGestureList(gestureIndex.GetAllGestures());
+        gestureManager.AddGesture(newGestureTxt.Text);
+        UpdateGestureList(gestureManager.GetGesturesList());
         newGestureTxt.Text = "";
-        gestureManager.AddNewGesture(newGestureTxt.Text);
       } catch (GestureAlreadyExistsException ex) {
         MessageBox.Show("Gesture '" + ex.Gesture + "' already exists");
       }
     }
 
     private void removeGestureBtn_Click(object sender, RoutedEventArgs e) {
-      gestureIndex.RemoveGesture((string)gestureList.SelectedItem);
-      gestureIndex.SaveDB();
-      UpdateGestureList(gestureIndex.GetAllGestures());
+      gestureManager.RemoveGesture((string)gestureList.SelectedItem);      
+      UpdateGestureList(gestureManager.GetGesturesList());
     }
 
     private void NewGestureTxtGotFocus(object sender, RoutedEventArgs e) {
@@ -108,9 +93,22 @@ namespace DaveFitness.Panels {
       }
     }
 
+    private void InitializeGestureList() {
+      GestureIndex tempGestureIndex = new GestureIndex(); // figure out how to get rid of this too
+      tempGestureIndex.LoadDB();
+      UpdateGestureList(tempGestureIndex.GetAllGestures());
+    }
+
+    private void UpdateGestureList(List<string> gestures) {
+      gestureList.Items.Clear();
+      foreach (string gesture in gestures) {
+        gestureList.Items.Add(gesture);
+      }
+    }
+
+
     private BodyManager bodyManager;
     private KinectManager kinectManager;
-    private GestureIndex gestureIndex;
     private GestureManager gestureManager;
   }
 }

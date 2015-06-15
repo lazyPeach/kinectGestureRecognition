@@ -14,15 +14,25 @@ namespace GestureRecognition {
   public class GestureManager {
     public GestureManager(BodyManager bodyManager) {
       this.bodyManager = bodyManager;
-
-
+      gestureIndex = new GestureIndex();
+      gestureIndex.LoadDB();
       bodyRecorder = new BodyRecorder(bodyManager);
     }
 
     public event GestureRecordEventHandler GestureRecordEventHandler;
 
-    public void AddNewGesture(string gestureName) {
+    public void AddGesture(string gestureName) {
+      gestureIndex.AddGesture(gestureName);
       gestureSamples = new List<Body[]>();
+    }
+
+    public void RemoveGesture(string gestureName) {
+      gestureIndex.RemoveGesture(gestureName);
+      gestureIndex.SaveDB();
+    }
+
+    public List<string> GetGesturesList() {
+      return gestureIndex.GetAllGestures();
     }
 
     public void StartRecordingInitialPosition() {
@@ -57,21 +67,6 @@ namespace GestureRecognition {
       }
     }
 
-    //private void ProcessSample() {
-    //  if (bodyManager.RecordedData.Count > 50) { // consider each gesture with less than 50 samples incorrect
-    //    //XmlSerializer serializer = new XmlSerializer(typeof(Queue<Body>));
-    //    string filePath = @"..\..\..\..\database\" + gestureFileName + samplesCount + ".xml";
-    //    bodyManager.SaveBodyData(filePath);
-
-
-    //    if (++samplesCount == 5) {
-    //      initialComputer.InitialPositionEventHandler -= InitialPositionEventHandler;
-    //    }
-
-    //    FireEvent(new GestureRecordEventArgs(samplesCount));
-    //  }
-    //}
-
     protected virtual void FireEvent(GestureRecordEventArgs e) {
       if (GestureRecordEventHandler != null) {
         GestureRecordEventHandler(this, e);
@@ -97,6 +92,7 @@ namespace GestureRecognition {
     private InitialPositionValidator initialPositionValidator;
     private BodyRecorder bodyRecorder;
     private BodyManager bodyManager;
+    private GestureIndex gestureIndex;
     private List<Body[]> gestureSamples;
     private int sampleNr = 0;
     private int minRecordPostures = 50;
