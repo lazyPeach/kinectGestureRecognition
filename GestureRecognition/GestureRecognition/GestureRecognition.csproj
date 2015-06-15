@@ -48,7 +48,6 @@
     <Compile Include="DynamicTimeWarp\DTWData.cs" />
     <Compile Include="DynamicTimeWarp\DTWResult.cs" />
     <Compile Include="Events\GestureRecordEventArgs.cs" />
-    <Compile Include="Events\InitialPositionEventArgs.cs" />
     <Compile Include="Exceptions\GestureAlreadyExistsException.cs" />
     <Compile Include="GestureDetector.cs" />
     <Compile Include="GestureIndex.cs" />

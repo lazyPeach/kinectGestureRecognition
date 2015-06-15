@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace GestureRecognition {
-  public delegate void GestureRecordEventHandler(object sender, GestureRecordEventArgs e);
+  //public delegate void GestureRecordEventHandler(object sender, GestureRecordEventArgs e);
 
   // this class only uses BodyManager to record a series of body samples
   public class BodyRecorder {

@@ -7,12 +7,12 @@ using System;
 using System.Collections.Generic;
 
 namespace GestureRecognition {
-  //public delegate void InitialPositionEventHandler(object sender, InitialPositionEventArgs e);
-
-  public enum InitialPositionState { Enter, Exit };
+  // used to get the change in initial position
+  public enum InitialPositionState { Enter, Exit, Neutral };
 
   public class InitialPositionValidator {
     public InitialPositionValidator(Body[] bodySamples) {
+      initialPositionDeviation = new BodyDeviation();
       ComputeInitialPosition(bodySamples);
     }
 
@@ -28,68 +28,26 @@ namespace GestureRecognition {
         OffsetBounds(boneName);
       }
     }
-    
-    //public event InitialPositionEventHandler InitialPositionEventHandler;
 
+    // presupunem din start ca e in initial position (previous state = true)
+    public InitialPositionState GetInitialPositionState(Body currentSample) {
+      if (!isPreviousSampleInInitialPosition && IsInitialPosition(currentSample)) {
+        isPreviousSampleInInitialPosition = IsInitialPosition(currentSample);
+        return InitialPositionState.Enter;
+      }
 
+      if (isPreviousSampleInInitialPosition && !IsInitialPosition(currentSample)) {
+        isPreviousSampleInInitialPosition = IsInitialPosition(currentSample);
+        return InitialPositionState.Exit;
+      }
 
-    //public InitialPositionValidator(BodyManager bodyManager) {
-    //  initialPositionDeviation = new BodyDeviation();
-    //  bodySamples = new List<Body>();
-      
-    //  this.bodyManager = bodyManager;
-    //  bodyManager.BodyEventHandler += BodyEventHandler;
-    //}
-
-    //public void ComputeInitialPosition() {
-    //  foreach (Body body in bodySamples) {
-    //    foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
-    //      ComputeMinBounds(body, boneName);
-    //      ComputeMaxBounds(body, boneName);
-    //    }
-    //  }
-
-    //  foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
-    //    OffsetBounds(boneName);
-    //  }
-
-    //  isInitialPositionComputed = true;
-    //}
-
-    //public bool Record { set { shouldRecord = value; } }
-
-    // InitialPosition event should be fired only when body enters in initial position or exits the
-    // initial position. To achieve this, a flag will be used to store the last known state of the 
-    // body. If the last known state is
-    //private void BodyEventHandler(object sender, BodyEventArgs e) {
-    //  if (shouldRecord) {
-    //    bodySamples.Add(e.Body);
-    //    return;
-    //  }
-
-    //  if (IsInitialPosition(e.Body) && !IsInitialPosition(previousSample)) {
-    //    FireEvent(new InitialPositionEventArgs(InitialPositionState.Enter));
-    //  }
-      
-    //  if (!IsInitialPosition(e.Body) && IsInitialPosition(previousSample)){
-    //    FireEvent(new InitialPositionEventArgs(InitialPositionState.Exit));
-    //  }
-
-    //  previousSample = e.Body;
-    //}
-
-    //protected virtual void FireEvent(InitialPositionEventArgs e) {
-    //  if (InitialPositionEventHandler != null) {
-    //    InitialPositionEventHandler(this, e);
-    //  }
-    //}
+      isPreviousSampleInInitialPosition = IsInitialPosition(currentSample);
+      return InitialPositionState.Neutral;
+    }
 
     private bool IsInitialPosition(Body body) {
-      //if (!isInitialPositionComputed) {
-      //  return false;
-      //}
-
       foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        // replace this godCondition with operator overloading => define > and < on BodyClass
         bool godCondition =
           body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W > initialPositionDeviation.MinBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W &&
           body.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W < initialPositionDeviation.MaxBound.BoneSkeleton.Bones[Mapper.BoneIndexMap[boneName]].Rotation.W &&
@@ -169,11 +127,60 @@ namespace GestureRecognition {
     }
 
 
-    //private bool shouldRecord = false;
-    //private bool isInitialPositionComputed = false;
-    //private Body previousSample = new Body();
-    //private BodyManager bodyManager;
     private BodyDeviation initialPositionDeviation;
-    //private List<Body> bodySamples;
+    private bool isPreviousSampleInInitialPosition = true;
   }
 }
+
+
+//public InitialPositionValidator(BodyManager bodyManager) {
+//  
+//  bodySamples = new List<Body>();
+
+//  this.bodyManager = bodyManager;
+//  bodyManager.BodyEventHandler += BodyEventHandler;
+//}
+
+//public void ComputeInitialPosition() {
+//  foreach (Body body in bodySamples) {
+//    foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+//      ComputeMinBounds(body, boneName);
+//      ComputeMaxBounds(body, boneName);
+//    }
+//  }
+
+//  foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+//    OffsetBounds(boneName);
+//  }
+
+//  isInitialPositionComputed = true;
+//}
+
+//public bool Record { set { shouldRecord = value; } }
+
+// InitialPosition event should be fired only when body enters in initial position or exits the
+// initial position. To achieve this, a flag will be used to store the last known state of the 
+// body. If the last known state is
+//private void BodyEventHandler(object sender, BodyEventArgs e) {
+//  if (shouldRecord) {
+//    bodySamples.Add(e.Body);
+//    return;
+//  }
+
+//  if (IsInitialPosition(e.Body) && !IsInitialPosition(previousSample)) {
+//    FireEvent(new InitialPositionEventArgs(InitialPositionState.Enter));
+//  }
+
+//  if (!IsInitialPosition(e.Body) && IsInitialPosition(previousSample)){
+//    FireEvent(new InitialPositionEventArgs(InitialPositionState.Exit));
+//  }
+
+//  previousSample = e.Body;
+//}
+
+//protected virtual void FireEvent(InitialPositionEventArgs e) {
+//  if (InitialPositionEventHandler != null) {
+//    InitialPositionEventHandler(this, e);
+//  }
+//}
+
