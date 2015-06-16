@@ -60,94 +60,12 @@ namespace DaveFitness.Panels {
       }
     }
 
+
+
+
+
+
     /*
-    private void PlaySelectedGesture() {
-      gestureTimer = new System.Timers.Timer { Interval = 40 };
-      gestureTimer.Elapsed += UpdateGesturePlayer;
-      gestureTimer.Start();
-    }
-
-    private void UpdateGesturePlayer(object sender, ElapsedEventArgs e) {
-      if (selectedGestureSamples != null) {
-        //this.Dispatcher.Invoke((Action)(() => { // update from any thread
-        //  //centerX = (int)sampleGestureCanvas.Width / 2;
-        //  //centerY = (int)sampleGestureCanvas.Height / 2; 
-        //  //DrawSampleGestureSkeleton(selectedGestureSamples[gestureSampleIndex++]);
-        //}));
-
-        if (gestureSampleIndex == selectedGestureSamples.Length) { // start from the beginning
-          gestureSampleIndex = 0;
-        }
-      }
-    }
-
-    private void DrawSampleGestureSkeleton(Body body) {
-      DrawSampleGestureJoints(body.JointSkeleton);
-      DrawSampleGestureBones(body.JointSkeleton);
-    }
-
-    private void DrawSampleGestureJoints(JointSkeleton jointSkeleton) {
-      sampleGestureCanvas.Children.Clear();
-      DrawPoint(centerX, centerY, Colors.Yellow);
-
-      SkeletonModel.Model.Joint centerJoint = jointSkeleton.GetJoint(JointName.HipCenter);
-
-      foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
-        SkeletonModel.Model.Joint joint = jointSkeleton.GetJoint(jointType);
-
-        if (joint == null) continue;
-
-        double x = joint.XCoord - centerJoint.XCoord;
-        double y = joint.YCoord - centerJoint.YCoord;
-
-        DrawPoint(centerX + x * 150, centerY - y * 150, Colors.Yellow); // have a mirror display
-      }
-    }
-
-    private void DrawSampleGestureBones(JointSkeleton jointSkeleton) {
-      SkeletonModel.Model.Joint centerJoint = jointSkeleton.GetJoint(JointName.HipCenter);
-
-      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
-        Tuple<JointName, JointName> boneExtremities = Mapper.BoneJointMap[boneName];
-        SkeletonModel.Model.Joint startJoint = jointSkeleton.GetJoint(boneExtremities.Item1);
-        SkeletonModel.Model.Joint endJoint = jointSkeleton.GetJoint(boneExtremities.Item2);
-
-        if (startJoint == null || endJoint == null) continue;
-
-        double x1 = startJoint.XCoord - centerJoint.XCoord;
-        double y1 = startJoint.YCoord - centerJoint.YCoord;
-        double x2 = endJoint.XCoord - centerJoint.XCoord;
-        double y2 = endJoint.YCoord - centerJoint.YCoord;
-
-        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.OrangeRed);
-      }
-    }
-
-    private void DrawPoint(double x, double y, Color color) {
-      Ellipse point = new Ellipse {
-        Width = 7,
-        Height = 7,
-        Fill = new SolidColorBrush(color)
-      };
-
-      Canvas.SetLeft(point, x - point.Width / 2);
-      Canvas.SetTop(point, y - point.Height / 2);
-      sampleGestureCanvas.Children.Add(point);
-    }
-
-    private void DrawLine(double x1, double y1, double x2, double y2, Color color) {
-      Line myLine = new Line();
-      myLine.Stroke = new SolidColorBrush(color);
-      myLine.X1 = x1;
-      myLine.X2 = x2;
-      myLine.Y1 = y1;
-      myLine.Y2 = y2;
-      myLine.HorizontalAlignment = HorizontalAlignment.Left;
-      myLine.VerticalAlignment = VerticalAlignment.Top;
-      myLine.StrokeThickness = 5;
-      sampleGestureCanvas.Children.Add(myLine);
-    }
-
     private void RecordInitialPosition() {
       initialPositionComputer.Record = true;  // start recording
     }
@@ -314,26 +232,13 @@ namespace DaveFitness.Panels {
     // display a sample of the gesture that should be performed by the user
 
 
-    private Body[] GetSelectedGestureSample() {
-      try {
-        string gestureName = (string)gestureList.SelectedItem;
-        string gestureFileName = @"..\..\..\..\database\" + gestureIndex.GestureDB[gestureName].fileName + "0.xml";
-
-        // load the gesture
-        BodyManager b = new BodyManager();
-        b.LoadBodyData(gestureFileName);
-
-        return b.RecordedDataAsArray;
-      } catch (Exception ex) {
-        Console.WriteLine(ex.Message);
-        return null;
-      }
-    }*/
+*/
 
     private void InitializeGestureList() {
       GestureIndex tempGestureIndex = new GestureIndex(); // figure out how to get rid of this too
       tempGestureIndex.LoadDB();
       UpdateGestureList(tempGestureIndex.GetAllGestures());
+      gestureList.SelectedIndex = 0;
     }
 
     private void UpdateGestureList(List<string> gestures) {
@@ -345,9 +250,21 @@ namespace DaveFitness.Panels {
 
 
     private void gestureList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-      gestureSampleIndex = 0;
-      //selectedGestureSamples = GetSelectedGestureSample();
+      gesturePlayer.GestureSamples = GetSelectedGestureSample();
     }
+
+    private Body[] GetSelectedGestureSample() {
+      try {
+        string gestureName = (string)gestureList.SelectedItem;
+        
+        
+        return gestureManager.GetGestureSample(gestureName);
+      } catch (Exception ex) {
+        Console.WriteLine(ex.Message);
+        return null;
+      }
+    }
+
 
     private BodyManager bodyManager;
     private KinectManager kinectManager;
@@ -362,11 +279,9 @@ namespace DaveFitness.Panels {
     private Body[] recordedGesture;
     private Body[] selectedGestureSamples;
 
-    private Timer gestureTimer;
     private Timer feedbackTimer;
 
-    private int centerX;
-    private int centerY;
+
     private int gestureSampleIndex;
     private int recordIndex;
     private int referenceIndex;

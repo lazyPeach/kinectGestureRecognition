@@ -21,8 +21,9 @@
 
     <Label Content="Repetitions" Foreground="White" HorizontalAlignment="Left" Margin="330,495,0,0" VerticalAlignment="Top" Height="50" Width="170" FontSize="30" FontWeight="Bold"/>
     <Label x:Name="repetitionsLbl" Content="" Foreground="White" HorizontalAlignment="Left" Margin="505,495,0,0" VerticalAlignment="Top" Height="50" Width="50" FontSize="30" FontWeight="Bold"/>
-    <Canvas x:Name="sampleGestureCanvas" Background="White" HorizontalAlignment="Right" Height="480" Margin="0,10,315,0" VerticalAlignment="Top" Width="330"/>
+    <!--<Canvas x:Name="sampleGestureCanvas" Background="White" HorizontalAlignment="Right" Height="480" Margin="0,10,315,0" VerticalAlignment="Top" Width="330"/>-->
     <Canvas x:Name="feedbackCanvas" Background="White" HorizontalAlignment="Left" Height="580" Margin="10,10,0,0" VerticalAlignment="Top" Width="975" Visibility="Hidden"/>
     <local:CountdownTimer HorizontalAlignment="Left" Height="50" Margin="10,495,0,0" VerticalAlignment="Top" Width="300"/>
+    <local:GesturePlayer x:Name="gesturePlayer" HorizontalAlignment="Left" Height="480" Margin="655,10,0,0" VerticalAlignment="Top" Width="330"/>
   </Grid>
 </UserControl>

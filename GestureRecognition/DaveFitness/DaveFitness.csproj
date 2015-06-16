@@ -79,6 +79,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Panels\GesturePlayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Panels\MainPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -102,6 +106,9 @@
     </Compile>
     <Compile Include="Panels\ExercisePanel.xaml.cs">
       <DependentUpon>ExercisePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\GesturePlayer.xaml.cs">
+      <DependentUpon>GesturePlayer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Panels\MainPanel.xaml.cs">
       <DependentUpon>MainPanel.xaml</DependentUpon>

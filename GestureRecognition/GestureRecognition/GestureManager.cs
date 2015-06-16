@@ -25,6 +25,7 @@ namespace GestureRecognition {
 
     public void AddGesture(string gestureName) {
       gestureSamples = new List<Body[]>();
+      sampleNr = 0;
       newGestureName = gestureName;
     }
 
@@ -35,6 +36,11 @@ namespace GestureRecognition {
 
     public List<string> GetGesturesList() {
       return gestureIndex.GetAllGestures();
+    }
+
+    public Body[] GetGestureSample(string gestureName) {
+      string gestureFileName = @"..\..\..\..\database\" + gestureIndex.GestureDB[gestureName].fileName + "0.xml";
+      return bodyManager.LoadBodyData(gestureFileName);
     }
 
     public void StartRecordingInitialPosition() {
