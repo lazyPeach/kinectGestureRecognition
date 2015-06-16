@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="480" d:DesignWidth="330">
   <Grid>
-    <Canvas Name="gestureCanvas" HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="330" Background="White"/>
+    <Canvas Name="gestureCanvas" HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="330" Background="Gray"/>
 
   </Grid>
 </UserControl>

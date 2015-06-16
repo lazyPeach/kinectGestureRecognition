@@ -11,31 +11,42 @@ using System.Threading.Tasks;
 
 namespace GestureRecognition {
   public class GestureDetector {
-    public GestureDetector(GestureIndex gestureIndex) {
-      this.gestureIndex = gestureIndex;
+    public GestureDetector(GestureIndex gestureIndex, string gestureName) {
+      gestureThreshold = gestureIndex.GestureDB[gestureName].threshold;
+      LoadSamples(gestureIndex.GestureDB[gestureName].fileName);
     }
 
-    public bool IsCorrectGesture(string gestureName, Body[] record) {
-      GestureData gestureData = gestureIndex.GestureDB[gestureName];
+    private float gestureThreshold = 0;
+    private List<Body[]> gestureSamples; 
 
+    private void LoadSamples(string fileName) {
+      gestureSamples = new List<Body[]>();
+      List<string> files = GetInterestFiles(fileName);
+
+      BodyManager bodyManager = new BodyManager();
+      foreach (string file in files) {
+        gestureSamples.Add(bodyManager.LoadBodyData(file));
+      }
+    }
+
+    private static List<string> GetInterestFiles(string fileName) {
       List<string> files = new List<string>();
 
       foreach (string s in Directory.EnumerateFiles(@"..\..\..\..\database\")) {
-        if (s.Contains(gestureData.fileName)) {
+        if (s.Contains(fileName)) {
           files.Add(s);
         }
       }
+      return files;
+    }
 
+    public bool IsCorrectGesture(Body[] record) {
       DTWComputer computer = new DTWComputer();
       float sum = 0;
 
-      for (int i = 0; i < files.Count; i++) {
+      foreach (Body[] sample in gestureSamples) {
         sum = 0;
-
-        BodyManager reference = new BodyManager();
-        reference.LoadBodyData(files[i]);
-
-        //computer.ComputeDTW(reference.RecordedDataAsArray, record);
+        computer.ComputeDTW(sample, record);
 
         foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
           for (int k = 0; k < 4; k++) {
@@ -43,22 +54,22 @@ namespace GestureRecognition {
           }
         }
 
-
+        Console.WriteLine(gestureThreshold + " " + sum);
         // we need a confidence threshold... getting the max difference between samples is not 
         // the best solution... for now * 2 seems to work
-        if (sum < gestureData.threshold * 2) {
-          Console.WriteLine("correct gesture threshold: " + sum);
+        //if (sum < gestureData.threshold * 2) {
+        //  Console.WriteLine("correct gesture threshold: " + sum);
 
-          closestSample = reference;
-          return true;
-        }
+        //  closestSample = reference;
+        //  return true;
+        //}
       }
 
-      Console.WriteLine("incorrect gesture threshold: " + sum);
+      //Console.WriteLine("incorrect gesture threshold: " + sum);
 
 
-      closestSample = new BodyManager();
-      closestSample.LoadBodyData(files[0]);
+      //closestSample = new BodyManager();
+      //closestSample.LoadBodyData(files[0]);
 
       return false;
     }

@@ -1,4 +1,5 @@
-﻿using GestureRecognition;
+﻿using DaveFitness.Events;
+using GestureRecognition;
 using GestureRecognition.Events;
 using Microsoft.Kinect;
 using SkeletonModel.Events;
@@ -20,6 +21,7 @@ namespace DaveFitness.Panels {
     public ExercisePanel() {
       InitializeComponent();
       InitializeGestureList();
+      countdownTimer.CountdownEventHandler += CountdownEventHandler;
 
       //gestureDetector = new GestureDetector(gestureIndex);
 
@@ -40,14 +42,27 @@ namespace DaveFitness.Panels {
       }
     }
 
+    private void CountdownEventHandler(object sender, CountdownEventArgs e) {
+      gestureManager.StopRecordingInitialPosition();
+      string gestureName = "";
+      this.Dispatcher.Invoke((Action)(() => { // update from any thread
+        gestureName = (string)gestureList.SelectedItem;
+      }));
+       
+      gestureManager.StartValidateGesture(gestureName);
+      //gestureManager.GestureRecordEventHandler += GestureRecordEventHandler;
+    }
+
     public void ExecuteVoiceCommand(VoiceCommand command) {
       switch (command) {
         case VoiceCommand.Start:
-          //if (bodyManager != null) {
-          //  initialPositionComputer = new InitialPositionValidator(bodyManager);
-          //  RecordInitialPosition();
-          //  StartRecordingTimer();
-          //}
+          if (bodyManager != null) {
+            countdownTimer.ResetTimer();
+            countdownTimer.StartCountdown();
+            gestureManager.StartRecordingInitialPosition();
+          }
+          break;
+        case VoiceCommand.Stop:
           break;
         case VoiceCommand.Up:
           if (gestureList.SelectedIndex > 0)
@@ -256,8 +271,6 @@ namespace DaveFitness.Panels {
     private Body[] GetSelectedGestureSample() {
       try {
         string gestureName = (string)gestureList.SelectedItem;
-        
-        
         return gestureManager.GetGestureSample(gestureName);
       } catch (Exception ex) {
         Console.WriteLine(ex.Message);

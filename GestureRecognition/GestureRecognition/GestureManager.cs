@@ -66,6 +66,17 @@ namespace GestureRecognition {
       gestureIndex.SaveDB();
     }
 
+    public void StartValidateGesture(string gestureName) {
+      gestureDetector = new GestureDetector(gestureIndex, gestureName);
+      //return gestureManager.GetGestureSample(gestureName);
+
+      this.bodyManager.BodyEventHandler += BodyGestureValidationEventHandler;
+    }
+
+    public void StopValidateGesture() {
+      this.bodyManager.BodyEventHandler -= BodyGestureValidationEventHandler;
+    }
+
     private void SaveSamples() {
       int index = 0;
       foreach (Body[] bodySequence in gestureSamples) {
@@ -120,6 +131,25 @@ namespace GestureRecognition {
       }
     }
 
+    private void BodyGestureValidationEventHandler(object sender, BodyEventArgs e) {
+      InitialPositionState state = initialPositionValidator.GetInitialPositionState(e.Body);
+      switch (state) {
+        case InitialPositionState.Neutral:
+          //Console.WriteLine("neutral");
+          break;
+        case InitialPositionState.Exit:
+          bodyRecorder.StartRecording();
+          break;
+        case InitialPositionState.Enter:
+          bodyRecorder.StopRecording();
+          if (bodyRecorder.BodySamples.Length < minRecordPostures) { // discard any data smaller than 50 samples
+            return;
+          }
+          gestureDetector.IsCorrectGesture(bodyRecorder.BodySamples);
+          break;
+      }
+    }
+
     private void BodyEventHandler(object sender, BodyEventArgs e) {
       InitialPositionState state = initialPositionValidator.GetInitialPositionState(e.Body);
       switch (state) {
@@ -140,6 +170,7 @@ namespace GestureRecognition {
     private BodyRecorder bodyRecorder;
     private BodyManager bodyManager;
     private GestureIndex gestureIndex;
+    private GestureDetector gestureDetector;
     private List<Body[]> gestureSamples;
     private int sampleNr = 0;
     private int minRecordPostures = 50;
