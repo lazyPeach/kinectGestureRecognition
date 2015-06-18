@@ -5,6 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GestureRecognition.Events {
-  class GestureRecognizeEventArgs {
+  public class GestureRecognizeEventArgs : EventArgs {
+    public GestureRecognizeEventArgs(bool isRecognized) {
+      isGestureRecognized = isRecognized;
+    }
+
+    public bool IsGestureRecognized { get { return isGestureRecognized; } }
+
+    private bool isGestureRecognized;
   }
 }

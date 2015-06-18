@@ -35,11 +35,15 @@ namespace DaveFitness.Panels {
 
     private void UpdateGesturePlayer(object sender, ElapsedEventArgs e) {
       if (gestureSamples != null) {
-        this.Dispatcher.Invoke((Action)(() => { // update from any thread
-          centerX = (int)gestureCanvas.Width / 2;
-          centerY = (int)gestureCanvas.Height / 2; 
-          DrawSkeleton(gestureSamples[sampleIndex++]);
-        }));
+        try {
+          this.Dispatcher.Invoke((Action)(() => { // update from any thread
+            centerX = (int)gestureCanvas.Width / 2;
+            centerY = (int)gestureCanvas.Height / 2;
+            DrawSkeleton(gestureSamples[sampleIndex++]);
+          }));
+        } catch (TaskCanceledException ex) {
+          Console.WriteLine("some exception" + ex.Message);
+        }
 
         if (sampleIndex == gestureSamples.Length) { // start from the beginning
           sampleIndex = 0;

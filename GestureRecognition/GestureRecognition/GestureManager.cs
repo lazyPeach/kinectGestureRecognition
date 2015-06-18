@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace GestureRecognition {
   public delegate void GestureRecordEventHandler(object sender, GestureRecordEventArgs e);
+  public delegate void GestureRecognizeEventHandler(object sender, GestureRecognizeEventArgs e);
 
   public class GestureManager {
     public GestureManager(BodyManager bodyManager) {
@@ -22,6 +23,7 @@ namespace GestureRecognition {
     }
 
     public event GestureRecordEventHandler GestureRecordEventHandler;
+    public event GestureRecognizeEventHandler GestureRecognizeEventHandler;
 
     public void AddGesture(string gestureName) {
       gestureSamples = new List<Body[]>();
@@ -117,7 +119,7 @@ namespace GestureRecognition {
         return;
       }
 
-      FireEvent(new GestureRecordEventArgs(++sampleNr));
+      FireRecordEvent(new GestureRecordEventArgs(++sampleNr));
       gestureSamples.Add(bodySequence);
 
       if (sampleNr == 5) {
@@ -125,9 +127,15 @@ namespace GestureRecognition {
       }
     }
 
-    protected virtual void FireEvent(GestureRecordEventArgs e) {
+    protected virtual void FireRecordEvent(GestureRecordEventArgs e) {
       if (GestureRecordEventHandler != null) {
         GestureRecordEventHandler(this, e);
+      }
+    }
+
+    protected virtual void FireRecognizedEvent(GestureRecognizeEventArgs e) {
+      if (GestureRecognizeEventHandler != null) {
+        GestureRecognizeEventHandler(this, e);
       }
     }
 
@@ -145,7 +153,7 @@ namespace GestureRecognition {
           if (bodyRecorder.BodySamples.Length < minRecordPostures) { // discard any data smaller than 50 samples
             return;
           }
-          gestureDetector.IsCorrectGesture(bodyRecorder.BodySamples);
+          FireRecognizedEvent(new GestureRecognizeEventArgs(gestureDetector.IsCorrectGesture(bodyRecorder.BodySamples)));
           break;
       }
     }
@@ -165,6 +173,8 @@ namespace GestureRecognition {
           break;
       }
     }
+
+    public GestureDetector GestureDetector { get { return gestureDetector; } }
 
     private InitialPositionValidator initialPositionValidator;
     private BodyRecorder bodyRecorder;

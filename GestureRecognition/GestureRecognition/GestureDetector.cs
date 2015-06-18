@@ -57,27 +57,23 @@ namespace GestureRecognition {
         Console.WriteLine(gestureThreshold + " " + sum);
         // we need a confidence threshold... getting the max difference between samples is not 
         // the best solution... for now * 2 seems to work
-        //if (sum < gestureData.threshold * 2) {
-        //  Console.WriteLine("correct gesture threshold: " + sum);
-
-        //  closestSample = reference;
-        //  return true;
-        //}
+        if (sum < gestureThreshold * 2) {
+          return true;
+        }
       }
 
-      //Console.WriteLine("incorrect gesture threshold: " + sum);
-
-
-      //closestSample = new BodyManager();
-      //closestSample.LoadBodyData(files[0]);
+      referenceSample = gestureSamples[0];
+      recordSample = record;
 
       return false;
     }
 
-    public BodyManager ClosestSample { get { return closestSample; } }
+    public Body[] ReferenceSample { get { return referenceSample; } }
+    public Body[] RecordSample { get { return recordSample; } }
 
 
     private GestureIndex gestureIndex;
-    private BodyManager closestSample;
+    private Body[] referenceSample;
+    private Body[] recordSample;
   }
 }
