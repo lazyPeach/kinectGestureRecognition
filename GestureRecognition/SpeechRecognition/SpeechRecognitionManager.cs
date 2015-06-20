@@ -57,7 +57,7 @@ namespace SpeechRecognition {
     }
 
     private void SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
-      const double confidenceThreshold = 0.5;
+      const double confidenceThreshold = 0.7;
 
       if (e.Result.Confidence >= confidenceThreshold) {
         OnEvent(new RecognizedCommandEventArgs(e.Result.Text));

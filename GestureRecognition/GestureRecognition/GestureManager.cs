@@ -25,6 +25,14 @@ namespace GestureRecognition {
     public event GestureRecordEventHandler GestureRecordEventHandler;
     public event GestureRecognizeEventHandler GestureRecognizeEventHandler;
 
+    public void PauseRecognition() {
+      this.bodyManager.BodyEventHandler -= BodyGestureValidationEventHandler;
+    }
+
+    public void ResumeRecognition() {
+      this.bodyManager.BodyEventHandler += BodyGestureValidationEventHandler;
+    }
+
     public void AddGesture(string gestureName) {
       gestureSamples = new List<Body[]>();
       sampleNr = 0;

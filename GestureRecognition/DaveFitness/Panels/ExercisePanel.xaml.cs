@@ -56,6 +56,8 @@ namespace DaveFitness.Panels {
     public void ExecuteVoiceCommand(VoiceCommand command) {
       switch (command) {
         case VoiceCommand.Start:
+          gestureManager.GestureRecognizeEventHandler -= GestureRecognizeEventHandler;
+
           if (bodyManager != null) {
             countdownTimer.ResetTimer();
             countdownTimer.StartCountdown();
@@ -66,6 +68,7 @@ namespace DaveFitness.Panels {
           break;
         case VoiceCommand.Stop:
           gestureManager.GestureRecognizeEventHandler -= GestureRecognizeEventHandler;
+          gestureManager.StopValidateGesture();
           break;
         case VoiceCommand.Up:
           if (gestureList.SelectedIndex > 0)
@@ -87,7 +90,7 @@ namespace DaveFitness.Panels {
           repetitionsLbl.Content = correctExecutions.ToString();
         }));
       } else {
-        feedbackPlayer.PlayFeedback(gestureManager.GestureDetector.RecordSample, gestureManager.GestureDetector.ReferenceSample);
+        feedbackPlayer.PlayFeedback(gestureManager);//.GestureDetector.RecordSample, gestureManager.GestureDetector.ReferenceSample);
         //while(feedbackPlayer.IsFeedbackPlaying);
       }
     }

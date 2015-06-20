@@ -1,4 +1,5 @@
-﻿using SkeletonModel.Model;
+﻿using GestureRecognition;
+using SkeletonModel.Model;
 using SkeletonModel.Util;
 using System;
 using System.Collections.Generic;
@@ -23,15 +24,21 @@ namespace DaveFitness.Panels {
       Visibility = System.Windows.Visibility.Hidden;
     }
 
-    public void PlayFeedback(Body[] record, Body[] reference) {
+    public void PlayFeedback(GestureManager gestureManager) {//Body[] record, Body[] reference) {
       Visibility = System.Windows.Visibility.Visible;
-      this.record = record;
-      this.reference = reference;
+      
+      this.record = gestureManager.GestureDetector.RecordSample;
+      this.reference = gestureManager.GestureDetector.ReferenceSample;
+      this.gestureManager = gestureManager;
+
       StartPlayback();
     }
 
+    private GestureManager gestureManager;
+
     private void StartPlayback() {
-      isFeedbackPlaying = true;
+      gestureManager.PauseRecognition();
+
       referenceIndex = 0;
       recordIndex = 0;
       timer = new System.Timers.Timer { Interval = 40 };
@@ -40,17 +47,13 @@ namespace DaveFitness.Panels {
     }
 
     private void UpdateFeedbackPanels(object sender, ElapsedEventArgs e) {
-      if (record != null && reference != null) {
-        this.Dispatcher.Invoke((Action)(() => { // update from any thread
-          DrawFeedbackSkeleton(reference[referenceIndex++], record[recordIndex++]);
-        }));
-      }
-
-      // play last sample until both are at the end
       if (recordIndex == record.Length && referenceIndex == reference.Length) {
+        recordIndex = 0;
+        referenceIndex = 0;
         timer.Elapsed -= UpdateFeedbackPanels;
         timer.Stop();
-        isFeedbackPlaying = false;
+        gestureManager.ResumeRecognition();
+        
         this.Dispatcher.Invoke((Action)(() => { // update from any thread
           Visibility = System.Windows.Visibility.Hidden;
         }));
@@ -58,6 +61,7 @@ namespace DaveFitness.Panels {
         return;
       }
 
+      // play last sample until both are at the end
       if (recordIndex == record.Length) {
         recordIndex--;
       }
@@ -65,9 +69,78 @@ namespace DaveFitness.Panels {
       if (referenceIndex == reference.Length) {
         referenceIndex--;
       }
+
+      if (record != null && reference != null) {
+        Body recSample = record[recordIndex++];
+        Body refSample = reference[referenceIndex++];
+
+        this.Dispatcher.Invoke((Action)(() => { // update from any thread
+          PlotParallelFeedback(refSample, recSample);
+          PlotRecordFeedback(recSample);
+          PlotReferenceFeedback(refSample);
+        }));
+      }
+
+     
     }
 
-    private void DrawFeedbackSkeleton(Body reference, Body record) {
+    private void PlotReferenceFeedback(Body reference) {
+      referenceCanvas.Children.Clear();
+
+      centerX = (int)referenceCanvas.Width / 2;
+      centerY = (int)referenceCanvas.Height / 2;
+
+      SkeletonModel.Model.Joint centerReferenceJoint = reference.JointSkeleton.GetJoint(JointName.HipCenter);
+
+      DrawBones(reference, centerReferenceJoint, referenceCanvas, Colors.Black);
+      DrawJoints(reference, centerReferenceJoint, referenceCanvas, Colors.Red);
+    }
+
+    private void PlotRecordFeedback(Body record) {
+      recordCanvas.Children.Clear();
+
+      centerX = (int)recordCanvas.Width / 2;
+      centerY = (int)recordCanvas.Height / 2;
+
+      SkeletonModel.Model.Joint centerRecordJoint = record.JointSkeleton.GetJoint(JointName.HipCenter);
+
+      DrawBones(record, centerRecordJoint, recordCanvas, Colors.Black);
+      DrawJoints(record, centerRecordJoint, recordCanvas, Colors.Red);
+    }
+
+    private void DrawJoints(Body body, SkeletonModel.Model.Joint centerJoint, Canvas canvas, Color color) {
+      foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
+        SkeletonModel.Model.Joint joint = body.JointSkeleton.GetJoint(jointType);
+
+        if (joint == null) continue;
+
+        double x = joint.XCoord - centerJoint.XCoord;
+        double y = joint.YCoord - centerJoint.YCoord;
+
+        DrawPoint(centerX + x * 150, centerY - y * 150, color, canvas);
+      }
+    }
+
+    private void DrawBones(Body body, SkeletonModel.Model.Joint centerJoint, Canvas canvas, Color color) {
+      foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+        Tuple<JointName, JointName> boneExtremities = Mapper.BoneJointMap[boneName];
+        SkeletonModel.Model.Joint startJoint = body.JointSkeleton.GetJoint(boneExtremities.Item1);
+        SkeletonModel.Model.Joint endJoint = body.JointSkeleton.GetJoint(boneExtremities.Item2);
+
+        if (startJoint == null || endJoint == null) continue;
+
+        double x1 = startJoint.XCoord - centerJoint.XCoord;
+        double y1 = startJoint.YCoord - centerJoint.YCoord;
+        double x2 = endJoint.XCoord - centerJoint.XCoord;
+        double y2 = endJoint.YCoord - centerJoint.YCoord;
+
+        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, color, canvas);
+      }
+    }
+
+
+
+    private void PlotParallelFeedback(Body reference, Body record) {
       parallelCanvas.Children.Clear();
 
       centerX = (int)parallelCanvas.Width / 2;
@@ -76,8 +149,8 @@ namespace DaveFitness.Panels {
       SkeletonModel.Model.Joint centerReferenceJoint = reference.JointSkeleton.GetJoint(JointName.HipCenter);
       SkeletonModel.Model.Joint centerRecordJoint = record.JointSkeleton.GetJoint(JointName.HipCenter);
 
-      DrawPoint(centerX, centerY, Colors.Yellow);
-      DrawPoint(centerX, centerY, Colors.Red);
+      //DrawPoint(centerX, centerY, Colors.Yellow, parallelCanvas);
+      //DrawPoint(centerX, centerY, Colors.Red, parallelCanvas);
 
       foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
         SkeletonModel.Model.Joint joint = reference.JointSkeleton.GetJoint(jointType);
@@ -87,7 +160,7 @@ namespace DaveFitness.Panels {
         double x = joint.XCoord - centerReferenceJoint.XCoord;
         double y = joint.YCoord - centerReferenceJoint.YCoord;
 
-        DrawPoint(centerX + x * 150, centerY - y * 150, Colors.Yellow);
+        DrawPoint(centerX + x * 150, centerY - y * 150, Colors.Yellow, parallelCanvas);
       }
 
       foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
@@ -102,7 +175,7 @@ namespace DaveFitness.Panels {
         double x2 = endJoint.XCoord - centerReferenceJoint.XCoord;
         double y2 = endJoint.YCoord - centerReferenceJoint.YCoord;
 
-        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.OrangeRed);
+        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.OrangeRed, parallelCanvas);
       }
 
       foreach (JointName jointType in Enum.GetValues(typeof(JointName))) {
@@ -113,7 +186,7 @@ namespace DaveFitness.Panels {
         double x = joint.XCoord - centerRecordJoint.XCoord;
         double y = joint.YCoord - centerRecordJoint.YCoord;
 
-        DrawPoint(centerX + x * 150, centerY - y * 150, Colors.Red);
+        DrawPoint(centerX + x * 150, centerY - y * 150, Colors.Red, parallelCanvas);
       }
 
       foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
@@ -128,11 +201,11 @@ namespace DaveFitness.Panels {
         double x2 = endJoint.XCoord - centerRecordJoint.XCoord;
         double y2 = endJoint.YCoord - centerRecordJoint.YCoord;
 
-        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.Black);
+        DrawLine(centerX + x1 * 150, centerY - y1 * 150, centerX + x2 * 150, centerY - y2 * 150, Colors.Black, parallelCanvas);
       }
     }
 
-    private void DrawPoint(double x, double y, Color color) {
+    private void DrawPoint(double x, double y, Color color, Canvas canvas) {
       Ellipse point = new Ellipse {
         Width = 7,
         Height = 7,
@@ -141,10 +214,10 @@ namespace DaveFitness.Panels {
 
       Canvas.SetLeft(point, x - point.Width / 2);
       Canvas.SetTop(point, y - point.Height / 2);
-      parallelCanvas.Children.Add(point);
+      canvas.Children.Add(point);
     }
 
-    private void DrawLine(double x1, double y1, double x2, double y2, Color color) {
+    private void DrawLine(double x1, double y1, double x2, double y2, Color color, Canvas canvas) {
       Line myLine = new Line();
       myLine.Stroke = new SolidColorBrush(color);
       myLine.X1 = x1;
@@ -154,12 +227,9 @@ namespace DaveFitness.Panels {
       myLine.HorizontalAlignment = HorizontalAlignment.Left;
       myLine.VerticalAlignment = VerticalAlignment.Top;
       myLine.StrokeThickness = 5;
-      parallelCanvas.Children.Add(myLine);
+      canvas.Children.Add(myLine);
     }
 
-    public bool IsFeedbackPlaying { get { return isFeedbackPlaying; } }
-
-    private bool isFeedbackPlaying = false;
     private int recordIndex = 0;
     private int referenceIndex = 0;
     private Timer timer;
