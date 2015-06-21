@@ -128,21 +128,5 @@ namespace DaveFitness.Panels {
     private BodyManager bodyManager;
     private KinectManager kinectManager;
     private GestureManager gestureManager;
-
-
-
-    private GestureIndex gestureIndex;
-    private GestureDetector gestureDetector;
-    private InitialPositionValidator initialPositionComputer;
-    private Body[] referenceGesture;
-    private Body[] recordedGesture;
-    private Body[] selectedGestureSamples;
-
-    private Timer feedbackTimer;
-
-
-    private int gestureSampleIndex;
-    private int recordIndex;
-    private int referenceIndex;
   }
 }

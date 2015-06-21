@@ -1,8 +1,13 @@
 ﻿using DaveFitness.Events;
+using SkeletonModel.Managers;
+using SkeletonModel.Model;
 using SpeechRecognition;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Collections.Generic;
+using System;
 
 namespace DaveFitness.Panels {
   public delegate void CommandEventHandler(object sender, CommandEventArgs e);
@@ -12,6 +17,27 @@ namespace DaveFitness.Panels {
 
     public MainPanel() {
       InitializeComponent();
+      PlaySampleGestures();
+    }
+
+    private void PlaySampleGestures() {
+      string gestureFolder = @"..\..\..\..\database\";
+      List<string> fileNames = new List<string>();
+
+      foreach (string file in Directory.EnumerateFiles(gestureFolder, "*.xml")) {
+        if (!file.Contains("gest")) {// gesture.xml is the serialization of gestureindex
+          fileNames.Add(file);
+        }
+      }
+
+      // need 2 random objects to avoid getting the same random nr... and also avoid complicated code
+      Random rnd1 = new Random();
+      Random rnd2 = new Random();
+
+      BodyManager bodyMgr = new BodyManager();
+
+      firstPlayer.GestureSamples = bodyMgr.LoadBodyData(fileNames[rnd1.Next(0, fileNames.Count / 2)]);
+      secondPlayer.GestureSamples = bodyMgr.LoadBodyData(fileNames[rnd2.Next(fileNames.Count / 2, fileNames.Count)]);
     }
 
     protected virtual void FireEvent(CommandEventArgs e) {

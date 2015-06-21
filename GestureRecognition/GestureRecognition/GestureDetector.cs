@@ -49,6 +49,8 @@ namespace GestureRecognition {
         computer.ComputeDTW(sample, record);
 
         foreach (BoneName boneName in Enum.GetValues(typeof(BoneName))) {
+          if (boneName == BoneName.BodyCenter) continue;
+
           for (int k = 0; k < 4; k++) {
             sum += computer.Result.Data[Mapper.BoneIndexMap[boneName]].BestCost[k];
           }
@@ -72,7 +74,6 @@ namespace GestureRecognition {
     public Body[] RecordSample { get { return recordSample; } }
 
 
-    private GestureIndex gestureIndex;
     private Body[] referenceSample;
     private Body[] recordSample;
   }
